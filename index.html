@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>薬理クイズ｜授乳婦向け薬剤</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --warning: #d97706;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-sub: #64748b;
+    --border: #e2e8f0;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .app-header h1 { font-size: 17px; font-weight: 700; }
+  .app-header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+  /* ===== スタート画面 ===== */
+  .start-wrap { padding: 20px 16px 40px; max-width: 480px; margin: 0 auto; }
+  .hero-card {
+    background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .hero-card .icon { font-size: 48px; margin-bottom: 10px; }
+  .hero-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .hero-card p { font-size: 14px; opacity: 0.9; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 10px;
+    text-align: left;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .mode-btn:active { background: #f1f5f9; }
+  .mode-btn .btn-icon { font-size: 28px; flex-shrink: 0; }
+  .mode-btn .btn-label { font-size: 15px; font-weight: 600; }
+  .mode-btn .btn-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .mode-btn .arrow { margin-left: auto; color: var(--text-sub); font-size: 18px; }
+
+  /* カテゴリリスト */
+  .cat-list { display: none; margin-top: 16px; }
+  .cat-list.open { display: block; }
+  .cat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.1s;
+  }
+  .cat-item:active { background: #f1f5f9; }
+  .cat-item .cat-count {
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ===== 問題画面 ===== */
+  .quiz-wrap { padding: 16px 16px 80px; max-width: 480px; margin: 0 auto; }
+  .progress-bar-bg {
+    background: #e2e8f0;
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 4px;
+  }
+  .progress-bar-fill {
+    background: var(--primary);
+    height: 6px;
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 16px;
+  }
+  .category-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: var(--primary);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    border: 1.5px solid var(--border);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.7;
+  }
+  .choices { margin-bottom: 16px; }
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.55;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .choice-btn:active:not(:disabled) { background: #f1f5f9; }
+  .choice-btn:disabled { cursor: default; }
+  .choice-label {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .choice-btn.correct { border-color: var(--success); background: var(--success-light); }
+  .choice-btn.correct .choice-label { background: var(--success); color: #fff; }
+  .choice-btn.wrong { border-color: var(--danger); background: var(--danger-light); }
+  .choice-btn.wrong .choice-label { background: var(--danger); color: #fff; }
+
+  /* フィードバックバナー */
+  .feedback-banner {
+    display: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+  }
+  .feedback-banner.show { display: flex; }
+  .feedback-banner.correct-fb { background: var(--success-light); color: var(--success); }
+  .feedback-banner.wrong-fb { background: var(--danger-light); color: var(--danger); }
+
+  /* 解説 */
+  .explanation-card {
+    display: none;
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #78350f;
+  }
+  .explanation-card.show { display: block; }
+  .explanation-card .exp-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--warning);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* 次へボタン */
+  .next-btn {
+    display: none;
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:active { background: var(--primary-dark); }
+
+  /* ===== 結果画面 ===== */
+  .result-wrap { padding: 24px 16px 60px; max-width: 480px; margin: 0 auto; }
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .result-emoji { font-size: 56px; margin-bottom: 12px; }
+  .result-score {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .result-denom { font-size: 20px; color: var(--text-sub); font-weight: 500; margin-bottom: 6px; }
+  .result-pct { font-size: 18px; font-weight: 700; color: var(--text-sub); margin-bottom: 12px; }
+  .result-msg { font-size: 14px; color: var(--text-sub); }
+  .result-actions { display: flex; gap: 10px; flex-direction: column; }
+  .result-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+  }
+  .result-btn.primary { background: var(--primary); color: #fff; }
+  .result-btn.secondary { background: var(--card); border: 1.5px solid var(--border); color: var(--text); }
+  .result-btn:active { opacity: 0.85; }
+
+  /* 正解一覧 */
+  .answer-list { margin-top: 20px; }
+  .answer-item {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .answer-item .ans-q { font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .answer-item .ans-result {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .ans-badge {
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .ans-badge.ok { background: var(--success-light); color: var(--success); }
+  .ans-badge.ng { background: var(--danger-light); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- ===== スタート画面 ===== -->
+<div id="screenStart" class="screen active">
+  <div class="app-header">
+    <h1>💊 薬理クイズ</h1>
+    <p>授乳婦向け薬剤 ｜ 受容体・作用機序</p>
+  </div>
+  <div class="start-wrap">
+    <div class="hero-card">
+      <div class="icon">🧬</div>
+      <h2>薬剤師のための薬理問題集</h2>
+      <p>全50問・5択・解説付き<br>受容体・作用点を中心に出題</p>
+    </div>
+
+    <div class="section-title">モードを選択</div>
+
+    <button class="mode-btn" onclick="startQuiz('all', true)">
+      <span class="btn-icon">🎲</span>
+      <div>
+        <div class="btn-label">全問ランダム</div>
+        <div class="btn-sub">50問すべてをシャッフルして出題</div>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="mode-btn" onclick="startQuiz('all', false)">
+      <span class="btn-icon">📋</span>
+      <div>
+        <div class="btn-label">全問順番通り</div>
+        <div class="btn-sub">問1〜50を順番に出題</div>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="mode-btn" onclick="toggleCatList()" id="catToggleBtn">
+      <span class="btn-icon">🗂️</span>
+      <div>
+        <div class="btn-label">カテゴリ別</div>
+        <div class="btn-sub">分野を絞って出題</div>
+      </div>
+      <span class="arrow" id="catArrow">›</span>
+    </button>
+
+    <div class="cat-list" id="catList"></div>
+  </div>
+</div>
+
+<!-- ===== 問題画面 ===== -->
+<div id="screenQuiz" class="screen">
+  <div class="app-header">
+    <h1>💊 薬理クイズ</h1>
+    <p id="quizHeaderSub">問題中...</p>
+  </div>
+  <div class="quiz-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="progress-text">
+      <span id="progressText">1 / 50</span>
+      <span id="scoreText">正解: 0</span>
+    </div>
+    <div class="category-badge" id="categoryBadge"></div>
+    <div class="question-card" id="questionText"></div>
+    <div class="choices" id="choicesWrap"></div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+    <div class="explanation-card" id="explanationCard">
+      <div class="exp-title">💡 解説</div>
+      <div id="explanationText"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">次の問題 →</button>
+  </div>
+</div>
+
+<!-- ===== 結果画面 ===== -->
+<div id="screenResult" class="screen">
+  <div class="app-header">
+    <h1>💊 薬理クイズ</h1>
+    <p>結果</p>
+  </div>
+  <div class="result-wrap">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-denom" id="resultDenom">/ 0 問</div>
+      <div class="result-pct" id="resultPct">正答率 0%</div>
+      <div class="result-msg" id="resultMsg"></div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="startQuiz('all', true)">もう一度（全問ランダム）</button>
+      <button class="result-btn secondary" onclick="showScreen('screenStart')">トップに戻る</button>
+    </div>
+    <div class="answer-list" id="answerList"></div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  {id:1,category:"解熱・鎮痛薬",question:"アセトアミノフェンの主な作用機序として最も適切なものはどれか。",choices:{A:"末梢のCOX-1を選択的に阻害する",B:"末梢のCOX-2を選択的に阻害する",C:"中枢のCOX-3（COX-1スプライスバリアント）を阻害する",D:"μオピオイド受容体を刺激する",E:"ロイコトリエン受容体を遮断する"},answer:"C",explanation:"アセトアミノフェンは主に中枢でのCOX-3阻害によって解熱・鎮痛効果を発揮する。末梢でのプロスタグランジン産生阻害作用は弱いため、抗炎症作用はほとんどなく、胃粘膜障害も少ない。"},
+  {id:2,category:"解熱・鎮痛薬",question:"セレコキシブの特徴として正しいものはどれか。",choices:{A:"COX-1を選択的に阻害し、抗血小板作用が強い",B:"COX-2を選択的に阻害し、胃粘膜障害が少ない",C:"COX-1・COX-2の両方を均等に阻害する",D:"アラキドン酸の産生を阻害する",E:"ロイコトリエンの合成を阻害する"},answer:"B",explanation:"セレコキシブはCOX-2選択的阻害薬。COX-1を介した胃粘膜保護（PGE2産生）を温存するため、従来のNSAIDsに比べて消化管障害が少ない。ただし心血管リスクへの注意が必要。"},
+  {id:3,category:"解熱・鎮痛薬",question:"イブプロフェン、ジクロフェナク、ロキソプロフェンに共通する作用機序はどれか。",choices:{A:"COX-1・COX-2の両方を非選択的に阻害してプロスタグランジン合成を抑制する",B:"ホスホリパーゼA2を阻害してアラキドン酸の遊離を抑制する",C:"トロンボキサンA2受容体を遮断する",D:"ブラジキニンB2受容体を遮断する",E:"5-リポキシゲナーゼを阻害する"},answer:"A",explanation:"これらは非ステロイド性抗炎症薬（NSAIDs）でありCOX-1・COX-2を非選択的に阻害する。アラキドン酸からプロスタグランジン・トロンボキサン産生を抑制することで解熱・鎮痛・抗炎症効果を発揮する。"},
+  {id:4,category:"解熱・鎮痛薬",question:"インドメタシンを分娩前に使用する際、特に注意すべき胎児への副作用はどれか。",choices:{A:"動脈管早期閉鎖",B:"二分脊椎",C:"心室中隔欠損",D:"口蓋裂",E:"四肢形成不全"},answer:"A",explanation:"インドメタシン（NSAIDs）はプロスタグランジン合成を阻害するため、胎児の動脈管開存に必要なPGE2を減少させ動脈管の早期閉鎖を引き起こすことがある。妊娠32週以降の使用は特に注意が必要。"},
+  {id:5,category:"降圧薬（Ca拮抗薬）",question:"アムロジピン・ニフェジピンの主な作用機序はどれか。",choices:{A:"L型電位依存性Caチャネルを遮断し、血管平滑筋を弛緩させる",B:"β1受容体を遮断して心拍出量を減少させる",C:"AT1受容体を遮断してアンジオテンシンIIの作用を抑制する",D:"ACEを阻害してアンジオテンシンIIの産生を抑制する",E:"α1受容体を遮断して末梢血管抵抗を低下させる"},answer:"A",explanation:"ジヒドロピリジン系Ca拮抗薬（アムロジピン・ニフェジピン）は血管平滑筋のL型Ca²⁺チャネルに選択性が高く、末梢血管拡張による降圧が主作用。心臓への作用は弱い。ニカルジピンも同系統。"},
+  {id:6,category:"降圧薬（Ca拮抗薬）",question:"ジルチアゼムがニフェジピンと異なる点はどれか。",choices:{A:"L型CaチャネルのみでなくT型Caチャネルも強く阻害する",B:"心臓（洞結節・房室結節）にも抑制作用を示し、頻脈を起こしにくい",C:"血管よりも心臓に選択性が高く、血圧低下作用は弱い",D:"COX-2阻害作用を併せ持つ",E:"腎臓でのNa再吸収を抑制する"},answer:"B",explanation:"ジルチアゼムはベンゾチアゼピン系Ca拮抗薬で、血管と心臓の両方に作用する。洞結節・房室結節のCaチャネルも阻害するため心拍数を低下させ、反射性頻脈が起こりにくい。これはジヒドロピリジン系との大きな違い。"},
+  {id:7,category:"降圧薬（ACE阻害薬）",question:"エナラプリル・カプトプリルの作用機序として正しいものはどれか。",choices:{A:"アンジオテンシンI→IIへの変換を触媒するACEを阻害する",B:"アンジオテンシンII受容体（AT1）を遮断する",C:"アルドステロンと競合してミネラルコルチコイド受容体を遮断する",D:"レニンの分泌を直接抑制する",E:"β1受容体を遮断してレニン分泌を減少させる"},answer:"A",explanation:"ACE阻害薬はアンジオテンシン変換酵素（ACE）を阻害し、アンジオテンシンIIの産生を抑制する。同時にブラジキニンの分解も抑制するため（ACEはキニナーゼII）空咳の副作用が生じる。"},
+  {id:8,category:"降圧薬（ARB）",question:"カンデサルタンの作用点はどれか。",choices:{A:"ACE（アンジオテンシン変換酵素）",B:"AT1受容体（アンジオテンシンII 1型受容体）",C:"AT2受容体（アンジオテンシンII 2型受容体）",D:"アルドステロン受容体",E:"レニン"},answer:"B",explanation:"ARB（アンジオテンシンII受容体拮抗薬）はAT1受容体を選択的に遮断する。ACE阻害薬とは異なりブラジキニン代謝には影響しないため空咳の副作用が少ない。AT2受容体は遮断しない（AT2刺激は臓器保護的）。"},
+  {id:9,category:"降圧薬（β遮断薬）",question:"プロプラノロールとビソプロロールの違いとして正しいものはどれか。",choices:{A:"プロプラノロールはβ1選択性が高く、ビソプロロールは非選択的である",B:"ビソプロロールはβ1選択性が高く、プロプラノロールはβ1・β2の両方を遮断する",C:"両者ともβ1選択性が高い",D:"プロプラノロールはα1も遮断するため起立性低血圧を起こしやすい",E:"ビソプロロールはISA（内因性交感神経刺激活性）を持つ"},answer:"B",explanation:"プロプラノロールは非選択的β遮断薬（β1・β2遮断）。β2遮断により気管支収縮が生じるため喘息患者には禁忌。ビソプロロールはβ1選択的β遮断薬で気管支への影響が少ない。ラベタロールはα1+β遮断の複合型。"},
+  {id:10,category:"降圧薬（その他）",question:"ラベタロールは複数の受容体に作用する。正しい組み合わせはどれか。",choices:{A:"α1受容体遮断＋β1受容体遮断",B:"α1受容体遮断＋β1・β2受容体遮断",C:"α1・α2受容体遮断＋β1受容体遮断",D:"α2受容体遮断＋β1受容体遮断",E:"α1受容体刺激＋β1受容体遮断"},answer:"B",explanation:"ラベタロールはα1受容体＋β1・β2受容体をすべて遮断する複合型遮断薬。α1遮断による末梢血管拡張とβ遮断による心拍出量減少の両方で降圧する。妊娠高血圧症候群にも使用される。"},
+  {id:11,category:"利尿薬",question:"スピロノラクトンの作用機序として正しいものはどれか。",choices:{A:"遠位尿細管のNa/K/2Cl共輸送体を阻害する",B:"近位尿細管の炭酸脱水素酵素を阻害する",C:"集合管でアルドステロン受容体（ミネラルコルチコイド受容体）と競合的に拮抗する",D:"集合管のADH（バソプレシン）受容体を遮断する",E:"糸球体でのナトリウム再吸収を直接抑制する"},answer:"C",explanation:"スピロノラクトンはアルドステロン拮抗薬（カリウム保持性利尿薬）。集合管でアルドステロン（ミネラルコルチコイド）受容体と競合してNa再吸収を抑制し、K排泄を減少させる。高カリウム血症に注意。"},
+  {id:12,category:"利尿薬",question:"アセタゾラミドの作用機序はどれか。",choices:{A:"ヘンレ係蹄上行脚のNa-K-2Cl共輸送体を阻害",B:"近位尿細管の炭酸脱水素酵素（CA）を阻害しNaHCO3の再吸収を抑制",C:"集合管のアルドステロン受容体を遮断",D:"遠位尿細管のNaCl共輸送体を阻害",E:"糸球体濾過率を直接増加させる"},answer:"B",explanation:"アセタゾラミドは炭酸脱水素酵素阻害薬。近位尿細管でH⁺産生が減少し、NaHCO3の再吸収が抑制される。代謝性アシドーシスを引き起こすことがある。緑内障（眼内圧低下）、高山病予防にも使用。"},
+  {id:13,category:"強心薬・抗不整脈薬",question:"ジゴキシンの主な作用機序はどれか。",choices:{A:"β1受容体を刺激してcAMPを増加させる",B:"心筋細胞膜のNa⁺/K⁺-ATPase（Naポンプ）を阻害する",C:"L型CaチャネルのCa²⁺流入を増加させる",D:"K⁺チャネルを遮断して活動電位を延長する",E:"PDE（ホスホジエステラーゼ）III阻害によりcAMPを増加させる"},answer:"B",explanation:"ジゴキシンはNa⁺/K⁺-ATPaseを阻害し、細胞内Na⁺増加→Na⁺/Ca²⁺交換輸送体（NCX）の逆方向活性化→細胞内Ca²⁺増加→心筋収縮力増強（陽性変力作用）を示す。また迷走神経刺激を介して房室伝導を抑制（陰性変時・変伝導作用）。"},
+  {id:14,category:"抗不整脈薬",question:"フレカイニドの主な作用機序と分類はどれか。",choices:{A:"Kチャネル遮断（クラスIII）",B:"Naチャネル遮断（クラスIC）",C:"β受容体遮断（クラスII）",D:"Caチャネル遮断（クラスIV）",E:"洞結節自動能の抑制（クラスV）"},answer:"B",explanation:"フレカイニドはVaughan Williams分類クラスICのNaチャネル遮断薬。活動電位の立ち上がり（phase 0）を遅延させ、伝導速度を低下させる。上室性・心室性不整脈に使用。"},
+  {id:15,category:"抗不整脈薬",question:"ベラパミルの作用と、プロプラノロールとの比較として正しいものはどれか。",choices:{A:"ベラパミルはNaチャネル遮断、プロプラノロールはKチャネル遮断",B:"ベラパミルはL型CaチャネルをCaチャネル遮断（クラスIV）、プロプラノロールはβ受容体遮断（クラスII）",C:"両者ともKチャネルを遮断して活動電位を延長する",D:"ベラパミルは洞結節に作用せずプロプラノロールのみ洞結節を抑制する",E:"両者の作用機序は同一で効力の差のみある"},answer:"B",explanation:"ベラパミルはクラスIVのCaチャネル遮断薬で、洞結節・房室結節のCa依存性活動電位を抑制する。プロプラノロールはクラスIIのβ遮断薬。両者は房室結節抑制作用があるため、併用は危険（高度徐脈・房室ブロック）。"},
+  {id:16,category:"抗凝固薬",question:"ワルファリンの作用機序として正しいものはどれか。",choices:{A:"トロンビンを直接阻害する",B:"活性化第X因子（FXa）を直接阻害する",C:"ビタミンKエポキシド還元酵素を阻害し、ビタミンK依存性凝固因子（II、VII、IX、X因子）の合成を阻害する",D:"アンチトロンビンIIIを活性化してトロンビンを不活化する",E:"血小板のADP受容体（P2Y12）を遮断する"},answer:"C",explanation:"ワルファリンはビタミンKエポキシド還元酵素（VKOR）を阻害し、ビタミンKの再生を阻害する。その結果、ビタミンK依存性凝固因子（II・VII・IX・X因子、プロテインC・S）の活性型γカルボキシル化が阻害され、凝固能が低下する。"},
+  {id:17,category:"抗凝固薬",question:"ダルテパリン（低分子ヘパリン）の作用機序はどれか。",choices:{A:"ビタミンK拮抗によって凝固因子合成を阻害する",B:"アンチトロンビンIII（AT-III）と結合してXa因子およびIIa因子（トロンビン）を不活化する（Xa阻害優位）",C:"トロンビンのフィブリノーゲン結合部位を直接遮断する",D:"血小板のGPIIb/IIIa受容体を遮断する",E:"プラスミノーゲンを活性化してフィブリンを溶解する"},answer:"B",explanation:"低分子ヘパリン（LMWH）はAT-IIIに結合してXa因子を主に阻害（Xa:IIa阻害比＝約2:1〜4:1）。未分画ヘパリンと比べてXa阻害優位で皮下注射可能、半減期が長い。プロタミンによる中和はXa阻害には部分的。"},
+  {id:18,category:"消化器系薬（PPI）",question:"オメプラゾール・エソメプラゾールの作用機序として正しいものはどれか。",choices:{A:"胃壁細胞のH2受容体を遮断してヒスタミン刺激を遮断する",B:"胃壁細胞のH⁺/K⁺-ATPase（プロトンポンプ）を不可逆的に阻害して胃酸分泌を抑制する",C:"ムスカリンM1受容体を遮断してアセチルコリン刺激を遮断する",D:"ガストリン受容体を遮断して胃酸分泌を抑制する",E:"ソマトスタチン受容体を刺激して胃酸分泌を抑制する"},answer:"B",explanation:"PPI（プロトンポンプ阻害薬）は酸性環境でスルフェンアミドに変換され、胃壁細胞のH⁺/K⁺-ATPaseのSH基と共有結合して不可逆的に阻害する。H2遮断薬より強力で持続的な胃酸分泌抑制効果を示す。"},
+  {id:19,category:"消化器系薬（H2受容体拮抗薬）",question:"ファモチジン・シメチジンの作用はどれか。",choices:{A:"プロトンポンプ（H⁺/K⁺-ATPase）を直接阻害する",B:"胃壁細胞のH2受容体を競合的に遮断してヒスタミンによる胃酸分泌を抑制する",C:"ムスカリン受容体を遮断する",D:"ガストリン受容体を遮断する",E:"プロスタグランジンE2受容体を刺激して胃粘膜を保護する"},answer:"B",explanation:"H2受容体拮抗薬は胃壁細胞のH2受容体（Gs共役型）をブロックし、ヒスタミン→アデニルシクラーゼ→cAMP→プロテインキナーゼA→H⁺/K⁺-ATPase活性化の経路を遮断する。シメチジンはCYP阻害（CYP1A2、2C9、3A4等）に注意。"},
+  {id:20,category:"消化器系薬（腸管運動）",question:"メトクロプラミド・ドンペリドンの制吐作用の主な機序はどれか。",choices:{A:"5-HT3受容体を遮断して中枢性嘔吐を抑制する",B:"D2受容体（ドパミンD2受容体）を遮断して化学受容器誘発帯（CTZ）への刺激を抑制する",C:"H1受容体を遮断して前庭からの刺激を抑制する",D:"ムスカリンM1受容体を遮断する",E:"オピオイドμ受容体を遮断する"},answer:"B",explanation:"メトクロプラミドとドンペリドンはD2受容体拮抗薬。CTZ（化学受容器誘発帯）はD2受容体が豊富で、ここを遮断することで制吐・胃排出促進（上部消化管の蠕動促進）効果を示す。メトクロプラミドは血液脳関門を通過するため錐体外路症状のリスクがある。"},
+  {id:21,category:"抗ヒスタミン薬",question:"セチリジン・フェキソフェナジン・ロラタジンが第1世代抗ヒスタミン薬（ジフェンヒドラミン等）と異なる点はどれか。",choices:{A:"H1受容体に作用せずロイコトリエン受容体を遮断する",B:"血液脳関門を通過しにくく中枢性の眠気が少ない（第2世代）",C:"抗ムスカリン作用が強く口渇・尿閉を起こしやすい",D:"H2受容体にも作用して胃酸分泌を抑制する",E:"ケミカルメディエーター遊離を抑制する作用のみを持つ"},answer:"B",explanation:"第2世代抗ヒスタミン薬（セチリジン・フェキソフェナジン・ロラタジン・デスロラタジン・レボセチリジン）は脂溶性が低く血液脳関門を透過しにくいため、中枢抑制（眠気）が少ない。抗ムスカリン作用も弱い。"},
+  {id:22,category:"抗アレルギー薬",question:"モンテルカストの作用機序はどれか。",choices:{A:"肥満細胞からのヒスタミン遊離を抑制する",B:"H1受容体を遮断してアレルギー症状を抑制する",C:"システイニルロイコトリエン受容体（CysLT1受容体）を遮断する",D:"IgEのFcεRI受容体への結合を阻害する",E:"5-リポキシゲナーゼを阻害してロイコトリエン産生を抑制する"},answer:"C",explanation:"モンテルカストはCysLT1（システイニルロイコトリエン1型）受容体拮抗薬。気管支喘息・アレルギー性鼻炎に使用。ロイコトリエン（LTC4・LTD4・LTE4）による気管支収縮・粘液分泌を抑制する。"},
+  {id:23,category:"免疫抑制薬",question:"シクロスポリン・タクロリムスに共通する作用機序はどれか。",choices:{A:"プリン合成を阻害してリンパ球増殖を抑制する",B:"カルシニューリン（ホスファターゼ）を阻害してIL-2産生を抑制する",C:"mTORを阻害してT細胞活性化を抑制する",D:"TNF-αと直接結合して中和する",E:"DNA二重鎖を架橋してDNA複製を阻害する"},answer:"B",explanation:"シクロスポリン・タクロリムスはともにカルシニューリン阻害薬。シクロスポリンはシクロフィリン、タクロリムスはFKBP12と結合した複合体がカルシニューリン（ホスファターゼ）を阻害し、NFAT（活性化T細胞核因子）の核内移行を阻止→IL-2産生抑制→T細胞活性化抑制。"},
+  {id:24,category:"免疫抑制薬",question:"アザチオプリンの作用機序はどれか。",choices:{A:"カルシニューリンを阻害してIL-2産生を抑制する",B:"体内で6-メルカプトプリン（6-MP）に変換され、プリン合成を阻害してDNA合成・リンパ球増殖を抑制する",C:"mTOR阻害によりT細胞の増殖シグナルを遮断する",D:"葉酸代謝を阻害してDNA合成を抑制する",E:"TNF-αに対するモノクローナル抗体として機能する"},answer:"B",explanation:"アザチオプリンは体内で6-MPに変換され、ヌクレオシドとしてプリン合成経路に取り込まれてDNA合成を阻害する。増殖の活発なリンパ球に強く作用。骨髄抑制（白血球減少）に注意。TPMT酵素の活性が低い患者では毒性が増強。"},
+  {id:25,category:"生物学的製剤（抗リウマチ薬）",question:"アダリムマブ・インフリキシマブ・ゴリムマブに共通する作用はどれか。",choices:{A:"IL-6受容体を遮断する",B:"TNF-α（腫瘍壊死因子α）を中和する",C:"B細胞のCD20抗原に結合してB細胞を除去する",D:"T細胞の共刺激シグナル（CD80/86-CD28）を阻害する",E:"JAK（ヤヌスキナーゼ）を阻害してサイトカインシグナルを遮断する"},answer:"B",explanation:"アダリムマブ・インフリキシマブ・ゴリムマブ・セルトリズマブペゴルはすべてTNF-α阻害薬（抗TNF製剤）。可溶型・膜型TNF-αに結合して中和し、関節破壊に関わる炎症カスケードを抑制。結核の再活性化リスクに注意（投与前にTBスクリーニングが必須）。"},
+  {id:26,category:"生物学的製剤（抗リウマチ薬）",question:"トシリズマブの作用機序として正しいものはどれか。",choices:{A:"TNF-αを直接中和する",B:"IL-6受容体（IL-6R）を遮断してIL-6シグナルを阻害する",C:"B細胞を選択的に除去する",D:"T細胞共刺激を阻害する",E:"インターロイキン-1受容体を遮断する"},answer:"B",explanation:"トシリズマブはヒト化抗IL-6受容体モノクローナル抗体。可溶型・膜型のIL-6受容体に結合してIL-6シグナル伝達を阻害する。RAの炎症・関節破壊に深く関わるIL-6経路を選択的にブロック。CRP低下が顕著。"},
+  {id:27,category:"抗菌薬（βラクタム系）",question:"アモキシシリン・アンピシリン・ベンジルペニシリン・セファロスポリン系に共通する作用機序はどれか。",choices:{A:"細菌のDNAジャイレース（トポイソメラーゼII）を阻害する",B:"細菌のリボソーム50Sサブユニットに結合してタンパク質合成を阻害する",C:"ペニシリン結合タンパク（PBP）に結合して細胞壁ペプチドグリカン合成（架橋形成）を阻害する",D:"細菌の細胞膜を障害して内容物を漏出させる",E:"葉酸合成酵素を阻害して核酸合成を抑制する"},answer:"C",explanation:"βラクタム系抗菌薬（ペニシリン・セファロスポリン・カルバペネム系）はすべてPBP（ペニシリン結合タンパク質、トランスペプチダーゼ）に不可逆的に結合し、細胞壁ペプチドグリカンの架橋形成を阻害する。MRSAはPBP2a（mecA遺伝子産物）を産生してβラクタムへの親和性が低下するため耐性。"},
+  {id:28,category:"抗菌薬（グリコペプチド系）",question:"バンコマイシンの作用機序はどれか。",choices:{A:"PBPに結合してペプチドグリカン架橋を阻害する",B:"ペプチドグリカン前駆体のD-Ala-D-Ala末端に結合してトランスグリコシラーゼ・トランスペプチダーゼ反応を阻害する",C:"50Sリボソームサブユニットに結合する",D:"DNAジャイレースを阻害する",E:"細胞膜に挿入されてイオンチャネルを形成する"},answer:"B",explanation:"バンコマイシン（グリコペプチド系）はペプチドグリカン前駆体のD-Ala-D-Ala配列に結合し、細胞壁合成に必要なトランスグリコシラーゼおよびトランスペプチダーゼ反応を立体障害で阻害する。MRSA・VREに対して使用されるが、VRE（バンコマイシン耐性腸球菌）はD-Ala-D-Lacに変化して耐性化。"},
+  {id:29,category:"抗菌薬（マクロライド系）",question:"エリスロマイシン・クラリスロマイシン・アジスロマイシン・ロキシスロマイシンの作用機序はどれか。",choices:{A:"細菌の30Sリボソームサブユニットに結合してタンパク質合成を阻害する",B:"細菌の50Sリボソームサブユニットに結合してmRNAの転移（トランスロケーション）を阻害する",C:"DNAジャイレース（トポイソメラーゼII）を阻害する",D:"細菌のRNAポリメラーゼを阻害する",E:"葉酸合成を阻害する"},answer:"B",explanation:"マクロライド系抗菌薬は細菌の50Sリボソームサブユニットの23S rRNAに結合し、ペプチジルtRNAのトランスロケーション（P部位→E部位移動）を阻害してタンパク質合成を停止させる。非典型病原体（マイコプラズマ・クラミジア・レジオネラ）に有効。"},
+  {id:30,category:"抗菌薬（キノロン系）",question:"シプロフロキサシン・レボフロキサシン・ノルフロキサシン・オフロキサシンの作用機序はどれか。",choices:{A:"30Sリボソームサブユニットに結合してタンパク質合成を阻害する",B:"DNAジャイレース（トポイソメラーゼII）とトポイソメラーゼIVを阻害してDNA複製を阻害する",C:"RNAポリメラーゼを阻害する",D:"細胞壁ペプチドグリカン合成を阻害する",E:"葉酸合成を阻害する"},answer:"B",explanation:"フルオロキノロン系はDNAジャイレース（グラム陰性菌で主標的）およびトポイソメラーゼIV（グラム陽性菌で主標的）を阻害し、DNA超らせん構造の制御を障害してDNA複製・転写・修復を阻止する。"},
+  {id:31,category:"抗菌薬（抗結核薬）",question:"イソニアジドの作用機序として正しいものはどれか。",choices:{A:"DNAジャイレースを阻害する",B:"50Sリボソームサブユニットを阻害する",C:"ミコール酸（mycolic acid）合成を阻害して結核菌の細胞壁合成を障害する",D:"RNAポリメラーゼを阻害する",E:"アラビノガラクタン合成を阻害する"},answer:"C",explanation:"イソニアジドはInhAおよびKatGを介してミコール酸合成を阻害し、結核菌特有の細胞壁成分を障害する。副作用として末梢神経障害（ビタミンB6欠乏）があり、ピリドキシン（B6）併用で予防する。リファンピシンはRNAポリメラーゼ（β-サブユニット）阻害、エタンブトールはアラビノシルトランスフェラーゼ阻害。"},
+  {id:32,category:"抗菌薬（クリンダマイシン）",question:"クリンダマイシンの作用機序と主な適応菌種として正しいものはどれか。",choices:{A:"DNAジャイレース阻害、グラム陰性菌に有効",B:"50Sリボソームサブユニット阻害（23S rRNAのペプチジルトランスフェラーゼ部位）、嫌気性菌・グラム陽性菌に有効",C:"30Sリボソームサブユニット阻害、グラム陰性菌に有効",D:"細胞壁合成阻害、MRSAに有効",E:"DNAインターカレーション、グラム陽性菌に有効"},answer:"B",explanation:"クリンダマイシン（リンコマイシン系）は50Sリボソームのペプチジルトランスフェラーゼセンターに結合してペプチド結合形成を阻害する。嫌気性菌・ブドウ球菌・連鎖球菌などグラム陽性菌に有効。偽膜性腸炎（C. difficile）のリスクが高い。"},
+  {id:33,category:"抗ウイルス薬",question:"アシクロビル・バラシクロビルの作用機序として正しいものはどれか。",choices:{A:"ウイルスのNAを阻害してウイルスの細胞外放出を阻害する",B:"ウイルスのM2プロトンチャネルを阻害してウイルス脱核を阻害する",C:"ウイルスチミジンキナーゼにより活性化（リン酸化）され、ウイルスDNAポリメラーゼを阻害する",D:"逆転写酵素を阻害する",E:"HIVプロテアーゼを阻害する"},answer:"C",explanation:"アシクロビルはHSV/VZVのチミジンキナーゼ（TK）によりモノリン酸化→宿主細胞酵素によりトリリン酸化→ウイルスDNAポリメラーゼを競合的に阻害・DNAへの取り込みでチェーン終止。TKを持たない宿主細胞では活性化されないため選択毒性が高い。バラシクロビルはアシクロビルのプロドラッグ（経口バイオアベイラビリティ改善）。"},
+  {id:34,category:"抗ウイルス薬",question:"オセルタミビルの作用機序として正しいものはどれか。",choices:{A:"インフルエンザウイルスのM2プロトンチャネルを阻害する",B:"ウイルスのRNAポリメラーゼを阻害する",C:"ウイルス表面のノイラミニダーゼ（NA）を阻害して感染細胞からのウイルス放出を抑制する",D:"ウイルスの赤血球凝集素（HA）に結合して細胞への吸着を阻害する",E:"宿主細胞のACE2受容体をブロックする"},answer:"C",explanation:"オセルタミビル（タミフル）はノイラミニダーゼ阻害薬。インフルエンザウイルスのNA酵素を阻害することで、感染細胞表面のシアル酸からのウイルス粒子の切断・放出を阻害し、ウイルスの拡散を防ぐ。発症48時間以内の投与が有効。"},
+  {id:35,category:"抗真菌薬",question:"フルコナゾール・イトラコナゾールの共通する作用機序はどれか。",choices:{A:"真菌細胞膜のエルゴステロールに直接結合して細胞膜を障害する",B:"真菌のβ-1,3-グルカン合成酵素を阻害する",C:"真菌のラノステロール14α-脱メチル化酵素（CYP51）を阻害してエルゴステロール合成を抑制する",D:"真菌のDNAポリメラーゼを阻害する",E:"真菌の細胞壁キチン合成を阻害する"},answer:"C",explanation:"アゾール系抗真菌薬（フルコナゾール・イトラコナゾール）はCYP51（ラノステロール14α-脱メチラーゼ）を阻害し、エルゴステロール（真菌細胞膜の主要ステロール）合成を抑制する。CYP酵素を阻害するため多くの薬物相互作用に注意。"},
+  {id:36,category:"偏頭痛治療薬",question:"スマトリプタン・ゾルミトリプタン・エレトリプタン（トリプタン系）の作用機序はどれか。",choices:{A:"COX-2を選択的に阻害して頭痛を抑制する",B:"5-HT1B/1D受容体を刺激して頭蓋内血管を収縮させ、神経ペプチド放出を抑制する",C:"ドパミンD2受容体を遮断して制吐・鎮痛効果を示す",D:"5-HT3受容体を遮断して嘔吐中枢を抑制する",E:"NMDAグルタミン酸受容体を遮断して中枢性痛覚を抑制する"},answer:"B",explanation:"トリプタン系は5-HT1B受容体（頭蓋内血管平滑筋）と5-HT1D受容体（三叉神経末梢）を刺激する選択的作動薬。①血管収縮、②CGRP・サブスタンスPなど神経原性炎症ペプチドの遊離抑制、③三叉神経核での痛覚伝達抑制の3つの機序で片頭痛を改善する。"},
+  {id:37,category:"糖尿病治療薬",question:"インスリンの細胞内シグナル伝達として正しいものはどれか。",choices:{A:"Gタンパク質共役受容体→アデニルシクラーゼ→cAMP増加",B:"チロシンキナーゼ型受容体→IRS-1リン酸化→PI3K→Akt活性化→グルコーストランスポーター（GLUT4）の細胞膜への移行",C:"イオンチャネル型受容体→Na⁺流入→膜脱分極",D:"核内受容体（ステロイドホルモン型）→転写調節",E:"グアニル酸シクラーゼ型受容体→cGMP増加"},answer:"B",explanation:"インスリン受容体はチロシンキナーゼ内蔵型受容体。インスリン結合→受容体の自己リン酸化→IRS（インスリン受容体基質）リン酸化→PI3K/AktおよびMAPKカスケード活性化→GLUT4含む小胞が細胞膜に融合してグルコース取り込み増加（筋肉・脂肪）。"},
+  {id:38,category:"甲状腺ホルモン薬",question:"レボチロキシン（T4）とリオチロニン（T3）の違いとして正しいものはどれか。",choices:{A:"T4は作用が速く、T3は作用が遅い",B:"T4の多くは末梢組織で脱ヨード化酵素によりT3に変換されて活性化される（T4はプロドラッグ的）",C:"T3は核内受容体（TR）に結合せずサイトゾルに留まる",D:"T4はGタンパク質共役受容体を介してcAMPを増加させる",E:"T3は細胞膜受容体に結合して即時的に作用する"},answer:"B",explanation:"甲状腺ホルモン受容体（TR）は核内受容体（リガンド依存性転写因子）。T4は末梢組織（肝・腎・筋肉）で脱ヨード化酵素（type 1, 2 deiodinase）によりT3に変換されてはじめて強い活性を示す。T4は半減期が長く（約7日）、T3は半減期が短く（約1日）、速効性がある。"},
+  {id:39,category:"吸入ステロイド薬",question:"ブデソニドの抗喘息作用の主な機序として正しいものはどれか。",choices:{A:"β2受容体を刺激して気管支平滑筋を弛緩させる",B:"グルココルチコイド受容体（GR）に結合して抗炎症遺伝子の転写を促進し、炎症性サイトカイン産生を抑制する",C:"ロイコトリエン受容体を遮断する",D:"IgEのFcεRI受容体への結合を阻害する",E:"5-リポキシゲナーゼを阻害する"},answer:"B",explanation:"吸入コルチコステロイド（ICS）は細胞内のグルココルチコイド受容体（GR）に結合し、GR-GRE（グルココルチコイド応答配列）複合体が抗炎症タンパク（リポコルチン1等）の転写を促進し、炎症性サイトカイン（IL-4, IL-5, IL-13等）・ケモカイン産生を抑制。吸入製剤は局所作用が主で全身副作用が少ない。"},
+  {id:40,category:"成長ホルモン薬",question:"ソマトロピン（成長ホルモン：GH）の受容体は何型か。",choices:{A:"Gタンパク質共役型受容体（GPCR）",B:"チロシンキナーゼ内蔵型受容体",C:"サイトカイン受容体（クラス1サイトカイン受容体）→JAK2-STAT5シグナル",D:"核内受容体",E:"イオンチャネル型受容体"},answer:"C",explanation:"GH受容体はクラスI型サイトカイン受容体ファミリーに属する。GH結合→受容体二量体化→JAK2（ヤヌスキナーゼ2）の活性化→STAT5リン酸化→核内移行→IGF-1（インスリン様成長因子-1）等の転写促進。"},
+  {id:41,category:"消化器系薬",question:"センノシド（センナ）の下剤としての作用機序はどれか。",choices:{A:"腸管の浸透圧を高めて腸内に水分を引き込む（浸透圧性下剤）",B:"大腸でアンスラキノン（レインアンスロン）に変換されてNa⁺/K⁺-ATPaseを阻害し腸管運動を亢進させる（刺激性下剤）",C:"腸管粘膜を油膜で覆って便を軟化させる（潤滑性下剤）",D:"水分吸収を増加させて腸内容物を膨張させる（膨張性下剤）",E:"5-HT4受容体を刺激して腸管蠕動を促進する"},answer:"B",explanation:"センノシドは大腸内の腸内細菌により活性代謝物（レインアンスロン）に変換される。これが大腸粘膜のNa⁺/K⁺-ATPaseを阻害してNa⁺・水の吸収を抑制し、さらに腸管粘膜を直接刺激して蠕動運動を亢進させる（刺激性下剤）。習慣性に注意。"},
+  {id:42,category:"抗寄生虫薬",question:"イベルメクチンの作用機序はどれか。",choices:{A:"寄生虫のDHFR（ジヒドロ葉酸還元酵素）を阻害する",B:"線虫のグルタミン酸依存性Cl⁻チャネル（GluCl）を活性化して虫体を麻痺させる",C:"寄生虫のヘモグロビン消化を阻害する",D:"寄生虫のβ-チューブリン重合を阻害する",E:"寄生虫のミトコンドリア呼吸鎖を阻害する"},answer:"B",explanation:"イベルメクチンは線虫・節足動物のグルタミン酸依存性Cl⁻チャネル（GluCl）を活性化し持続的に開口させる。Cl⁻流入による過分極が神経筋接合部を麻痺させ虫体を死滅させる。哺乳類のGABA作動性Cl⁻チャネルへの親和性は低く、選択的毒性がある。アルベンダゾールはβ-チューブリン阻害。"},
+  {id:43,category:"降圧薬（メチルドパ）",question:"メチルドパの降圧機序として正しいものはどれか。",choices:{A:"α1受容体を遮断して末梢血管抵抗を低下させる",B:"β1受容体を遮断して心拍出量を低下させる",C:"中枢でα-メチルノルアドレナリン（偽性神経伝達物質）に変換されてα2受容体を刺激し、交感神経活動を抑制する",D:"ACEを阻害してアンジオテンシンII産生を抑制する",E:"Na⁺/K⁺-ATPaseを阻害する"},answer:"C",explanation:"メチルドパは脳内でDOPA脱炭酸酵素によりα-メチルドーパミン→α-メチルノルアドレナリンに変換される。これが脳幹（孤束核）のα2受容体（Gi共役）を刺激して交感神経中枢活動を抑制し、血圧・心拍数を低下させる。妊娠高血圧症候群の第一選択薬として使用される。"},
+  {id:44,category:"降圧薬（直接血管拡張薬）",question:"ヒドララジンの降圧機序はどれか。",choices:{A:"中枢α2受容体刺激",B:"末梢α1受容体遮断",C:"血管平滑筋に直接作用してcGMPを増加させ、血管を拡張させる（直接性血管拡張薬）",D:"ACEを阻害する",E:"Lチャネル遮断"},answer:"C",explanation:"ヒドララジンは動脈平滑筋に直接作用して血管拡張を引き起こす直接作用型血管拡張薬。cGMP増加やK⁺チャネル開口などの機序が関与する。反射性頻脈・体液貯留が生じやすいため、β遮断薬や利尿薬と併用されることが多い。妊娠高血圧症候群の静注薬として使用。"},
+  {id:45,category:"抗菌薬（キノロン系）",question:"フルオロキノロン系抗菌薬（シプロフロキサシン・レボフロキサシン等）を妊婦・小児に原則使用しない理由として最も適切なものはどれか。",choices:{A:"催奇形性（葉酸代謝阻害による神経管閉鎖障害）",B:"未熟な肝酵素（グルクロン酸転移酵素）による代謝障害",C:"未成熟な軟骨への毒性（関節症）を引き起こす可能性",D:"赤芽球症（ビリルビン置換による核黄疸）",E:"乳歯・永久歯の着色（カルシウムとのキレート形成）"},answer:"C",explanation:"動物実験でフルオロキノロン系は負荷軟骨（荷重関節）の軟骨障害（関節症）を引き起こすことが示されており、成長期の小児には原則禁忌。同様の理由で妊婦への投与も慎重。ドキシサイクリン（テトラサイクリン系）はCaとキレートを形成して歯牙着色を引き起こす（選択肢E）。"},
+  {id:46,category:"消化器系薬",question:"ウルソデオキシコール酸（UDCA）の肝臓・胆道への作用として正しいものはどれか。",choices:{A:"胆汁酸の腸肝循環を遮断して胆汁酸の体内蓄積を減少させる",B:"疎水性胆汁酸（細胞毒性が高い）と置換されて胆汁組成を改善し、肝細胞保護・胆石溶解作用を示す",C:"胆のう平滑筋を収縮させて胆汁の排出を促進する",D:"オッジ括約筋を弛緩させる",E:"コレステロール合成酵素（HMG-CoA還元酵素）を阻害する"},answer:"B",explanation:"UDCAは親水性（細胞毒性が低い）の胆汁酸であり、体内の疎水性胆汁酸（コール酸・ケノデオキシコール酸等）の割合を低下させて胆汁を無毒化する。また胆汁中コレステロール飽和度を低下させてコレステロール胆石を溶解する作用もある。"},
+  {id:47,category:"抗菌薬（テトラサイクリン系）",question:"ドキシサイクリン（テトラサイクリン系）の作用機序はどれか。",choices:{A:"細菌の50Sリボソームサブユニットに結合する",B:"細菌の30Sリボソームサブユニットに結合してアミノアシルtRNAのA部位への結合を阻害する",C:"DNAジャイレースを阻害する",D:"PBPに結合して細胞壁合成を阻害する",E:"細菌のRNAポリメラーゼを阻害する"},answer:"B",explanation:"テトラサイクリン系は細菌の30Sリボソームサブユニットに結合し、アミノアシルtRNAがA部位へ到達するのを阻害してタンパク質合成を抑制する。小児の歯牙着色・骨発育障害のため8歳未満・妊婦には原則禁忌。"},
+  {id:48,category:"鎮咳薬",question:"デキストロメトルファンの鎮咳作用の機序として正しいものはどれか。",choices:{A:"末梢の咳受容体（迷走神経求心路）に作用する",B:"中枢の咳中枢（延髄）に作用してμオピオイド受容体を刺激する",C:"延髄の咳中枢にあるNMDA受容体拮抗・シグマ受容体刺激で咳反射を抑制する（非麻薬性）",D:"気管支を拡張させて咳刺激を軽減する",E:"気道分泌を促進して喀出を容易にする"},answer:"C",explanation:"デキストロメトルファンはモルヒナン骨格を持つ非麻薬性中枢性鎮咳薬。μオピオイド受容体への親和性は低く、NMDA受容体拮抗とシグマ受容体作動により咳中枢を抑制する。通常量では依存性・呼吸抑制がほとんどない。"},
+  {id:49,category:"ホルモン薬",question:"デスモプレシンの主な作用はどれか。",choices:{A:"アルドステロン受容体を刺激してNa再吸収を促進する",B:"V2受容体（バソプレシン2型受容体）を刺激して集合管での水再吸収を増加させる",C:"V1受容体を刺激して血管収縮と血圧上昇を引き起こす",D:"GnRH受容体を脱感作させてゴナドトロピン分泌を抑制する",E:"TSH受容体を刺激して甲状腺ホルモン産生を促進する"},answer:"B",explanation:"デスモプレシンはADH（抗利尿ホルモン、バソプレシン）の合成アナログ。V2受容体（Gs共役型、腎集合管基底側に発現）を選択的に刺激し、cAMP→PKA→アクアポリン2（AQP2）の細胞膜への挿入→水再吸収増加→抗利尿作用を示す。尿崩症・夜尿症に使用。"},
+  {id:50,category:"その他（痛風）",question:"アロプリノールの作用機序はどれか。",choices:{A:"尿酸の腎排泄を促進する（尿酸排泄促進薬）",B:"キサンチンオキシダーゼを阻害してヒポキサンチン→キサンチン→尿酸への変換を阻害し尿酸産生を抑制する（尿酸産生抑制薬）",C:"腸管での尿酸吸収を阻害する",D:"尿酸結晶の溶解を促進する",E:"好中球の尿酸結晶への反応（NLRP3インフラマソーム）を抑制する"},answer:"B",explanation:"アロプリノールはキサンチンオキシダーゼの阻害薬。プリン体（ヒポキサンチン・キサンチン）から尿酸への変換を阻害して血清尿酸値を低下させる。腎機能低下者では用量調整が必要。代謝物オキシプリノールも活性を持つ。発作急性期には使用しない（発作を誘発・遷延させる可能性）。"}
+];
+
+// ===== State =====
+let currentList = [];
+let currentIndex = 0;
+let score = 0;
+let userAnswers = [];
+let answered = false;
+
+// ===== カテゴリリスト構築 =====
+function buildCatList() {
+  const counts = {};
+  quizData.forEach(q => { counts[q.category] = (counts[q.category] || 0) + 1; });
+  const cats = Object.keys(counts).sort();
+  const container = document.getElementById('catList');
+  cats.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'cat-item';
+    div.innerHTML = `<span>${cat}</span><span class="cat-count">${counts[cat]}問</span>`;
+    div.onclick = () => startQuiz(cat, true);
+    container.appendChild(div);
+  });
+}
+
+function toggleCatList() {
+  const list = document.getElementById('catList');
+  const arrow = document.getElementById('catArrow');
+  const isOpen = list.classList.toggle('open');
+  arrow.textContent = isOpen ? '∨' : '›';
+}
+
+// ===== クイズ開始 =====
+function startQuiz(mode, shuffle) {
+  if (mode === 'all') {
+    currentList = [...quizData];
+  } else {
+    currentList = quizData.filter(q => q.category === mode);
+  }
+  if (shuffle) {
+    currentList.sort(() => Math.random() - 0.5);
+  }
+  currentIndex = 0;
+  score = 0;
+  userAnswers = [];
+  showScreen('screenQuiz');
+  renderQuestion();
+}
+
+// ===== 問題描画 =====
+function renderQuestion() {
+  answered = false;
+  const q = currentList[currentIndex];
+  const total = currentList.length;
+  const pct = Math.round(((currentIndex) / total) * 100);
+
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${currentIndex + 1} / ${total}`;
+  document.getElementById('scoreText').textContent = `正解: ${score}`;
+  document.getElementById('quizHeaderSub').textContent = `問${currentIndex + 1} / ${total}`;
+  document.getElementById('categoryBadge').textContent = q.category;
+  document.getElementById('questionText').textContent = `Q${currentIndex + 1}. ${q.question}`;
+
+  const choicesWrap = document.getElementById('choicesWrap');
+  choicesWrap.innerHTML = '';
+  ['A','B','C','D','E'].forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-label">${key}</span><span>${q.choices[key]}</span>`;
+    btn.onclick = () => selectAnswer(key, btn);
+    choicesWrap.appendChild(btn);
+  });
+
+  document.getElementById('feedbackBanner').className = 'feedback-banner';
+  document.getElementById('feedbackBanner').innerHTML = '';
+  document.getElementById('explanationCard').className = 'explanation-card';
+  document.getElementById('nextBtn').className = 'next-btn';
+}
+
+// ===== 解答処理 =====
+function selectAnswer(selected, clickedBtn) {
+  if (answered) return;
+  answered = true;
+  const q = currentList[currentIndex];
+  const isCorrect = selected === q.answer;
+  if (isCorrect) score++;
+  userAnswers.push({ q, selected, isCorrect });
+
+  // 全ボタン無効化 & ハイライト
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(btn => {
+    btn.disabled = true;
+    const label = btn.querySelector('.choice-label').textContent;
+    if (label === q.answer) btn.classList.add('correct');
+    else if (label === selected && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // フィードバックバナー
+  const fb = document.getElementById('feedbackBanner');
+  if (isCorrect) {
+    fb.className = 'feedback-banner correct-fb show';
+    fb.innerHTML = '✅ 正解！';
+  } else {
+    fb.className = 'feedback-banner wrong-fb show';
+    fb.innerHTML = `❌ 不正解　正解は <strong>${q.answer}</strong>`;
+  }
+
+  // 解説
+  document.getElementById('explanationText').textContent = q.explanation;
+  document.getElementById('explanationCard').className = 'explanation-card show';
+
+  // スコア更新
+  document.getElementById('scoreText').textContent = `正解: ${score}`;
+
+  // 次へボタン
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.className = 'next-btn show';
+  const isLast = currentIndex >= currentList.length - 1;
+  nextBtn.textContent = isLast ? '結果を見る ›' : '次の問題 →';
+}
+
+// ===== 次の問題 =====
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentList.length) {
+    showResult();
+  } else {
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+// ===== 結果画面 =====
+function showResult() {
+  showScreen('screenResult');
+  window.scrollTo(0, 0);
+  const total = currentList.length;
+  const pct = Math.round((score / total) * 100);
+
+  let emoji = '😢';
+  let msg = 'もう少し復習が必要です。';
+  if (pct >= 90) { emoji = '🏆'; msg = '素晴らしい！完璧に近い正答率です！'; }
+  else if (pct >= 70) { emoji = '🎉'; msg = 'よくできました！苦手な分野を重点的に復習しましょう。'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'あと一歩！解説を読んで再チャレンジしてみましょう。'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultDenom').textContent = `/ ${total} 問`;
+  document.getElementById('resultPct').textContent = `正答率 ${pct}%`;
+  document.getElementById('resultMsg').textContent = msg;
+
+  const list = document.getElementById('answerList');
+  list.innerHTML = '<div style="font-weight:700;font-size:14px;margin-bottom:12px;color:#1e293b;">📋 解答一覧</div>';
+  userAnswers.forEach((ua, i) => {
+    const div = document.createElement('div');
+    div.className = 'answer-item';
+    div.innerHTML = `
+      <div class="ans-q">Q${i+1}. ${ua.q.question}</div>
+      <div class="ans-result">
+        <span class="ans-badge ${ua.isCorrect ? 'ok' : 'ng'}">${ua.isCorrect ? '正解' : '不正解'}</span>
+        <span style="color:#64748b">あなた: <strong>${ua.selected}</strong>　正解: <strong>${ua.q.answer}</strong></span>
+      </div>
+      ${!ua.isCorrect ? `<div style="margin-top:6px;font-size:12px;color:#78350f;background:#fffbeb;border-radius:6px;padding:6px 8px;">${ua.q.explanation}</div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ===== 画面切替 =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== 初期化 =====
+buildCatList();
+</script>
+</body>
+</html>
