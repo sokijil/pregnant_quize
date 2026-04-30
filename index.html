@@ -87,6 +87,32 @@
   .mode-btn .btn-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
   .mode-btn .arrow { margin-left: auto; color: var(--text-sub); font-size: 18px; }
 
+  /* サブボタン（ランダム/順番通り） */
+  .sub-btns { display: none; margin-top: 8px; margin-bottom: 4px; }
+  .sub-btns.open { display: flex; gap: 8px; }
+  .sub-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.1s;
+  }
+  .sub-btn:active { opacity: 0.8; }
+  .sub-btn.random { background: #eff6ff; border-color: #93c5fd; color: var(--primary); }
+  .sub-btn.ordered { background: #f0fdf4; border-color: #86efac; color: var(--success); }
+
+  /* セクションブロック */
+  .section-block { margin-bottom: 10px; }
+  .mode-btn.pharma-btn { border-color: #bfdbfe; }
+  .mode-btn.pk-btn { border-color: #fbcfe8; }
+  .mode-btn.all-btn { border-color: #d1d5db; }
+  .mode-btn.open { background: #f8fafc; }
+
   /* カテゴリリスト */
   .cat-list { display: none; margin-top: 16px; }
   .cat-list.open { display: block; }
@@ -321,39 +347,71 @@
     <div class="hero-card">
       <div class="icon">🧬</div>
       <h2>薬剤師のための薬理問題集</h2>
-      <p>全50問・5択・解説付き<br>受容体・作用点を中心に出題</p>
+      <p>全75問・5択・解説付き<br>薬理 50問 ＋ 薬物動態 25問</p>
     </div>
 
-    <div class="section-title">モードを選択</div>
+    <div class="section-title">セクションを選択</div>
 
-    <button class="mode-btn" onclick="startQuiz('all', true)">
-      <span class="btn-icon">🎲</span>
-      <div>
-        <div class="btn-label">全問ランダム</div>
-        <div class="btn-sub">50問すべてをシャッフルして出題</div>
+    <!-- 薬理セクション -->
+    <div class="section-block">
+      <button class="mode-btn pharma-btn" onclick="toggleSub('subPharma', this)" id="btnPharma">
+        <span class="btn-icon">💊</span>
+        <div>
+          <div class="btn-label">薬理（受容体・作用機序）</div>
+          <div class="btn-sub">50問 ｜ 受容体・作用点・分類を出題</div>
+        </div>
+        <span class="arrow" id="arrowPharma">›</span>
+      </button>
+      <div class="sub-btns" id="subPharma">
+        <button class="sub-btn random" onclick="startQuiz('pharma', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('pharma', false)">📋 順番通り</button>
       </div>
-      <span class="arrow">›</span>
-    </button>
+    </div>
 
-    <button class="mode-btn" onclick="startQuiz('all', false)">
-      <span class="btn-icon">📋</span>
-      <div>
-        <div class="btn-label">全問順番通り</div>
-        <div class="btn-sub">問1〜50を順番に出題</div>
+    <!-- 薬物動態セクション -->
+    <div class="section-block">
+      <button class="mode-btn pk-btn" onclick="toggleSub('subPK', this)" id="btnPK">
+        <span class="btn-icon">🤰</span>
+        <div>
+          <div class="btn-label">薬物動態（妊婦・授乳婦）</div>
+          <div class="btn-sub">25問 ｜ 胎盤通過・母乳移行・PK変化</div>
+        </div>
+        <span class="arrow" id="arrowPK">›</span>
+      </button>
+      <div class="sub-btns" id="subPK">
+        <button class="sub-btn random" onclick="startQuiz('pk', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('pk', false)">📋 順番通り</button>
       </div>
-      <span class="arrow">›</span>
-    </button>
+    </div>
 
-    <button class="mode-btn" onclick="toggleCatList()" id="catToggleBtn">
-      <span class="btn-icon">🗂️</span>
-      <div>
-        <div class="btn-label">カテゴリ別</div>
-        <div class="btn-sub">分野を絞って出題</div>
+    <!-- 全問セクション -->
+    <div class="section-block">
+      <button class="mode-btn all-btn" onclick="toggleSub('subAll', this)" id="btnAll">
+        <span class="btn-icon">📚</span>
+        <div>
+          <div class="btn-label">全問</div>
+          <div class="btn-sub">75問すべてを出題</div>
+        </div>
+        <span class="arrow" id="arrowAll">›</span>
+      </button>
+      <div class="sub-btns" id="subAll">
+        <button class="sub-btn random" onclick="startQuiz('all', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('all', false)">📋 順番通り</button>
       </div>
-      <span class="arrow" id="catArrow">›</span>
-    </button>
+    </div>
 
-    <div class="cat-list" id="catList"></div>
+    <!-- カテゴリ別 -->
+    <div class="section-block">
+      <button class="mode-btn" onclick="toggleCatList()" id="catToggleBtn">
+        <span class="btn-icon">🗂️</span>
+        <div>
+          <div class="btn-label">カテゴリ別</div>
+          <div class="btn-sub">分野を絞って出題</div>
+        </div>
+        <span class="arrow" id="catArrow">›</span>
+      </button>
+      <div class="cat-list" id="catList"></div>
+    </div>
   </div>
 </div>
 
@@ -484,6 +542,9 @@ const quizData = [
   {id:75,category:"妊娠中の薬物動態",question:"妊娠中の1回換気量の変化が吸入薬に与える影響として正しいものはどれか。",choices:{A:"妊娠中は1回換気量が約40%増加し分時換気量が増大するため、吸入薬の肺到達量が増加する可能性がある",B:"妊娠中は横隔膜が下降するため肺容量が増大し、吸入薬が希釈されて効果が低下する",C:"妊娠中の呼吸機能変化は吸入薬の薬物動態に影響を与えない",D:"妊娠中は呼吸回数が減少するため吸入薬の効果が低下する",E:"妊娠中は気道抵抗が増大するため吸入薬の肺到達量が低下する"},answer:"A",explanation:"妊娠中はプロゲステロンによる呼吸中枢刺激と子宮増大による横隔膜挙上で、1回換気量が約40%増加し分時換気量が増大する（呼吸数は大きく変化しない）。機能的残気量（FRC）は低下する。この変化により吸入麻酔薬の誘導が速くなることが知られており、吸入薬全般で肺到達量の変化を考慮する必要がある。"}
 ];
 
+// ===== 薬物動態カテゴリ定義 =====
+const PK_CATEGORIES = ["妊娠中の薬物動態", "胎盤通過性", "母乳移行性"];
+
 // ===== State =====
 let currentList = [];
 let currentIndex = 0;
@@ -513,10 +574,35 @@ function toggleCatList() {
   arrow.textContent = isOpen ? '∨' : '›';
 }
 
+// ===== サブボタン展開 =====
+function toggleSub(subId, btn) {
+  const sub = document.getElementById(subId);
+  const isOpen = sub.classList.toggle('open');
+  // 矢印を回転
+  const arrowMap = { subPharma: 'arrowPharma', subPK: 'arrowPK', subAll: 'arrowAll' };
+  const arrow = document.getElementById(arrowMap[subId]);
+  if (arrow) arrow.textContent = isOpen ? '∨' : '›';
+  btn.classList.toggle('open', isOpen);
+  // 他のサブボタンを閉じる
+  ['subPharma', 'subPK', 'subAll'].forEach(id => {
+    if (id !== subId) {
+      document.getElementById(id).classList.remove('open');
+      const a = document.getElementById(arrowMap[id]);
+      if (a) a.textContent = '›';
+      const b = document.getElementById(id === 'subPharma' ? 'btnPharma' : id === 'subPK' ? 'btnPK' : 'btnAll');
+      if (b) b.classList.remove('open');
+    }
+  });
+}
+
 // ===== クイズ開始 =====
 function startQuiz(mode, shuffle) {
   if (mode === 'all') {
     currentList = [...quizData];
+  } else if (mode === 'pharma') {
+    currentList = quizData.filter(q => !PK_CATEGORIES.includes(q.category));
+  } else if (mode === 'pk') {
+    currentList = quizData.filter(q => PK_CATEGORIES.includes(q.category));
   } else {
     currentList = quizData.filter(q => q.category === mode);
   }
