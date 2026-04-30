@@ -38,13 +38,30 @@
   .app-header {
     background: var(--primary);
     color: #fff;
-    padding: 16px 20px 12px;
+    padding: 12px 16px 10px;
     position: sticky;
     top: 0;
     z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .app-header h1 { font-size: 17px; font-weight: 700; }
   .app-header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .home-btn {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.45);
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .home-btn:active { background: rgba(255,255,255,0.32); }
+  .update-date { font-size: 11px; opacity: 0.72; white-space: nowrap; }
 
   /* ===== スタート画面 ===== */
   .start-wrap { padding: 20px 16px 40px; max-width: 480px; margin: 0 auto; }
@@ -347,8 +364,13 @@
 <!-- ===== スタート画面 ===== -->
 <div id="screenStart" class="screen active">
   <div class="app-header">
-    <h1>💊 薬理クイズ</h1>
-    <p>授乳婦向け薬剤 ｜ 受容体・作用機序</p>
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p>妊婦・授乳婦 認定試験対策</p>
+    </div>
+    <div class="header-right">
+      <span class="update-date">更新: 2025.05.01</span>
+    </div>
   </div>
   <div class="start-wrap">
     <div class="hero-card">
@@ -538,8 +560,13 @@
 <!-- ===== 問題画面 ===== -->
 <div id="screenQuiz" class="screen">
   <div class="app-header">
-    <h1>💊 薬理クイズ</h1>
-    <p id="quizHeaderSub">問題中...</p>
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p id="quizHeaderSub">問題中...</p>
+    </div>
+    <div class="header-right">
+      <button class="home-btn" onclick="goHome()">🏠 ホーム</button>
+    </div>
   </div>
   <div class="quiz-wrap">
     <div class="progress-bar-bg">
@@ -564,8 +591,13 @@
 <!-- ===== 結果画面 ===== -->
 <div id="screenResult" class="screen">
   <div class="app-header">
-    <h1>💊 薬理クイズ</h1>
-    <p>結果</p>
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p>結果</p>
+    </div>
+    <div class="header-right">
+      <button class="home-btn" onclick="goHome()">🏠 ホーム</button>
+    </div>
   </div>
   <div class="result-wrap">
     <div class="result-card">
@@ -947,6 +979,11 @@ function showResult() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  showScreen('screenStart');
 }
 
 // ===== 初期化 =====
