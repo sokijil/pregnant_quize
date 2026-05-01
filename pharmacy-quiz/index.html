@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>薬理クイズ｜授乳婦向け薬剤</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --warning: #d97706;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-sub: #64748b;
+    --border: #e2e8f0;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 12px 16px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .app-header h1 { font-size: 17px; font-weight: 700; }
+  .app-header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .home-btn {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.45);
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .home-btn:active { background: rgba(255,255,255,0.32); }
+  .update-date { font-size: 11px; opacity: 0.72; white-space: nowrap; }
+
+  /* ===== スタート画面 ===== */
+  .start-wrap { padding: 20px 16px 40px; max-width: 480px; margin: 0 auto; }
+  .hero-card {
+    background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .hero-card .icon { font-size: 48px; margin-bottom: 10px; }
+  .hero-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .hero-card p { font-size: 14px; opacity: 0.9; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 10px;
+    text-align: left;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .mode-btn:active { background: #f1f5f9; }
+  .mode-btn .btn-icon { font-size: 28px; flex-shrink: 0; }
+  .mode-btn .btn-label { font-size: 15px; font-weight: 600; }
+  .mode-btn .btn-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .mode-btn .arrow { margin-left: auto; color: var(--text-sub); font-size: 18px; }
+
+  /* サブボタン（ランダム/順番通り） */
+  .sub-btns { display: none; margin-top: 8px; margin-bottom: 4px; }
+  .sub-btns.open { display: flex; gap: 8px; }
+  .sub-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.1s;
+  }
+  .sub-btn:active { opacity: 0.8; }
+  .sub-btn.random { background: #eff6ff; border-color: #93c5fd; color: var(--primary); }
+  .sub-btn.ordered { background: #f0fdf4; border-color: #86efac; color: var(--success); }
+
+  /* セクションブロック */
+  .section-block { margin-bottom: 10px; }
+  .mode-btn.pharma-btn { border-color: #bfdbfe; }
+  .mode-btn.pk-btn { border-color: #fbcfe8; }
+  .mode-btn.all-btn { border-color: #d1d5db; }
+  .mode-btn.perinatal-btn    { border-color: #a7f3d0; }
+  .mode-btn.fetal-btn        { border-color: #fde68a; }
+  .mode-btn.complication-btn { border-color: #fca5a5; }
+  .mode-btn.congenital-btn   { border-color: #c4b5fd; }
+  .mode-btn.research-btn     { border-color: #93c5fd; }
+  .mode-btn.nutrition-btn    { border-color: #6ee7b7; }
+  .mode-btn.risk-btn         { border-color: #fdba74; }
+  .mode-btn.open { background: #f8fafc; }
+
+  /* カテゴリリスト */
+  .cat-list { display: none; margin-top: 16px; }
+  .cat-list.open { display: block; }
+  .cat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.1s;
+  }
+  .cat-item:active { background: #f1f5f9; }
+  .cat-item .cat-count {
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ===== 問題画面 ===== */
+  .quiz-wrap { padding: 16px 16px 80px; max-width: 480px; margin: 0 auto; }
+  .progress-bar-bg {
+    background: #e2e8f0;
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 4px;
+  }
+  .progress-bar-fill {
+    background: var(--primary);
+    height: 6px;
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 16px;
+  }
+  .category-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: var(--primary);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    border: 1.5px solid var(--border);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.7;
+  }
+  .choices { margin-bottom: 16px; }
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.55;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .choice-btn:active:not(:disabled) { background: #f1f5f9; }
+  .choice-btn:disabled { cursor: default; }
+  .choice-label {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .choice-btn.correct { border-color: var(--success); background: var(--success-light); }
+  .choice-btn.correct .choice-label { background: var(--success); color: #fff; }
+  .choice-btn.wrong { border-color: var(--danger); background: var(--danger-light); }
+  .choice-btn.wrong .choice-label { background: var(--danger); color: #fff; }
+
+  /* フィードバックバナー */
+  .feedback-banner {
+    display: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+  }
+  .feedback-banner.show { display: flex; }
+  .feedback-banner.correct-fb { background: var(--success-light); color: var(--success); }
+  .feedback-banner.wrong-fb { background: var(--danger-light); color: var(--danger); }
+
+  /* 解説 */
+  .explanation-card {
+    display: none;
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #78350f;
+  }
+  .explanation-card.show { display: block; }
+  .explanation-card .exp-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--warning);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* 次へボタン */
+  .next-btn {
+    display: none;
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:active { background: var(--primary-dark); }
+
+  /* ===== 結果画面 ===== */
+  .result-wrap { padding: 24px 16px 60px; max-width: 480px; margin: 0 auto; }
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .result-emoji { font-size: 56px; margin-bottom: 12px; }
+  .result-score {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .result-denom { font-size: 20px; color: var(--text-sub); font-weight: 500; margin-bottom: 6px; }
+  .result-pct { font-size: 18px; font-weight: 700; color: var(--text-sub); margin-bottom: 12px; }
+  .result-msg { font-size: 14px; color: var(--text-sub); }
+  .result-actions { display: flex; gap: 10px; flex-direction: column; }
+  .result-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+  }
+  .result-btn.primary { background: var(--primary); color: #fff; }
+  .result-btn.secondary { background: var(--card); border: 1.5px solid var(--border); color: var(--text); }
+  .result-btn:active { opacity: 0.85; }
+
+  /* 正解一覧 */
+  .answer-list { margin-top: 20px; }
+  .answer-item {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .answer-item .ans-q { font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .answer-item .ans-result {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .ans-badge {
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .ans-badge.ok { background: var(--success-light); color: var(--success); }
+  .ans-badge.ng { background: var(--danger-light); color: var(--danger); }
+  /* 難易度バッジ */
+  .diff-badge { display:inline-block; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:6px; }
+  .diff-badge.d1 { background:#dcfce7; color:#15803d; }
+  .diff-badge.d2 { background:#dbeafe; color:#1d4ed8; }
+  .diff-badge.d3 { background:#fee2e2; color:#dc2626; }
+  /* 難易度セクションボタン */
+  .mode-btn.diff-easy-btn { border-color: #86efac; }
+  .mode-btn.diff-mid-btn  { border-color: #93c5fd; }
+  .mode-btn.diff-hard-btn { border-color: #fca5a5; }
+  .mode-btn.clinical-btn  { border-color: #f9a8d4; }
+</style>
+</head>
+<body>
+
+<!-- ===== スタート画面 ===== -->
+<div id="screenStart" class="screen active">
+  <div class="app-header">
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p>妊婦・授乳婦 認定試験対策</p>
+    </div>
+    <div class="header-right">
+      <span class="update-date">更新: 2025.05.01</span>
+    </div>
+  </div>
+  <div class="start-wrap">
+    <div class="hero-card">
+      <div class="icon">🧬</div>
+      <h2>薬剤師のための薬理問題集</h2>
+      <p>全160問・5択・解説付き<br>9テーマで学べる認定試験対策問題集</p>
+    </div>
+
+    <div class="section-title">セクションを選択</div>
+
+    <!-- 薬理セクション -->
+    <div class="section-block">
+      <button class="mode-btn pharma-btn" onclick="toggleSub('subPharma', this)" id="btnPharma">
+        <span class="btn-icon">💊</span>
+        <div>
+          <div class="btn-label">薬理（受容体・作用機序）</div>
+          <div class="btn-sub">50問 ｜ 受容体・作用点・分類を出題</div>
+        </div>
+        <span class="arrow" id="arrowPharma">›</span>
+      </button>
+      <div class="sub-btns" id="subPharma">
+        <button class="sub-btn random" onclick="startQuiz('pharma', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('pharma', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 薬物動態セクション -->
+    <div class="section-block">
+      <button class="mode-btn pk-btn" onclick="toggleSub('subPK', this)" id="btnPK">
+        <span class="btn-icon">🤰</span>
+        <div>
+          <div class="btn-label">薬物動態（妊婦・授乳婦）</div>
+          <div class="btn-sub">25問 ｜ 胎盤通過・母乳移行・PK変化</div>
+        </div>
+        <span class="arrow" id="arrowPK">›</span>
+      </button>
+      <div class="sub-btns" id="subPK">
+        <button class="sub-btn random" onclick="startQuiz('pk', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('pk', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+
+    <!-- 周産期医療・生理学セクション -->
+    <div class="section-block">
+      <button class="mode-btn perinatal-btn" onclick="toggleSub('subPerinatal', this)" id="btnPerinatal">
+        <span class="btn-icon">🏥</span>
+        <div>
+          <div class="btn-label">周産期医療・生理学</div>
+          <div class="btn-sub">10問 ｜ 妊娠・分娩・産褥の生理・ホルモン</div>
+        </div>
+        <span class="arrow" id="arrowPerinatal">›</span>
+      </button>
+      <div class="sub-btns" id="subPerinatal">
+        <button class="sub-btn random" onclick="startQuiz('perinatal', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('perinatal', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 胎児・新生児セクション -->
+    <div class="section-block">
+      <button class="mode-btn fetal-btn" onclick="toggleSub('subFetal', this)" id="btnFetal">
+        <span class="btn-icon">👶</span>
+        <div>
+          <div class="btn-label">胎児・新生児</div>
+          <div class="btn-sub">8問 ｜ 器官形成・発育・新生児の生理・代謝</div>
+        </div>
+        <span class="arrow" id="arrowFetal">›</span>
+      </button>
+      <div class="sub-btns" id="subFetal">
+        <button class="sub-btn random" onclick="startQuiz('fetal', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('fetal', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 合併疾患セクション -->
+    <div class="section-block">
+      <button class="mode-btn complication-btn" onclick="toggleSub('subComplication', this)" id="btnComplication">
+        <span class="btn-icon">🩺</span>
+        <div>
+          <div class="btn-label">合併疾患</div>
+          <div class="btn-sub">10問 ｜ 高血圧・糖尿病・てんかん・喘息等</div>
+        </div>
+        <span class="arrow" id="arrowComplication">›</span>
+      </button>
+      <div class="sub-btns" id="subComplication">
+        <button class="sub-btn random" onclick="startQuiz('complication', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('complication', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 先天奇形・先天異常セクション -->
+    <div class="section-block">
+      <button class="mode-btn congenital-btn" onclick="toggleSub('subCongenital', this)" id="btnCongenital">
+        <span class="btn-icon">🧬</span>
+        <div>
+          <div class="btn-label">先天奇形・先天異常</div>
+          <div class="btn-sub">8問 ｜ 疫学・催奇形物質・リスク評価</div>
+        </div>
+        <span class="arrow" id="arrowCongenital">›</span>
+      </button>
+      <div class="sub-btns" id="subCongenital">
+        <button class="sub-btn random" onclick="startQuiz('congenital', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('congenital', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 臨床研究・非臨床試験セクション -->
+    <div class="section-block">
+      <button class="mode-btn research-btn" onclick="toggleSub('subResearch', this)" id="btnResearch">
+        <span class="btn-icon">📊</span>
+        <div>
+          <div class="btn-label">臨床研究・非臨床試験</div>
+          <div class="btn-sub">7問 ｜ 疫学研究・生殖発生毒性試験</div>
+        </div>
+        <span class="arrow" id="arrowResearch">›</span>
+      </button>
+      <div class="sub-btns" id="subResearch">
+        <button class="sub-btn random" onclick="startQuiz('research', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('research', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 栄養・嗜好品セクション -->
+    <div class="section-block">
+      <button class="mode-btn nutrition-btn" onclick="toggleSub('subNutrition', this)" id="btnNutrition">
+        <span class="btn-icon">🥗</span>
+        <div>
+          <div class="btn-label">栄養・嗜好品</div>
+          <div class="btn-sub">7問 ｜ 葉酸・鉄・アルコール・たばこ</div>
+        </div>
+        <span class="arrow" id="arrowNutrition">›</span>
+      </button>
+      <div class="sub-btns" id="subNutrition">
+        <button class="sub-btn random" onclick="startQuiz('nutrition', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('nutrition', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- リスク評価・コミュニケーションセクション -->
+    <div class="section-block">
+      <button class="mode-btn risk-btn" onclick="toggleSub('subRisk', this)" id="btnRisk">
+        <span class="btn-icon">⚖️</span>
+        <div>
+          <div class="btn-label">リスク評価・コミュニケーション</div>
+          <div class="btn-sub">5問 ｜ リスクベネフィット評価・情報提供</div>
+        </div>
+        <span class="arrow" id="arrowRisk">›</span>
+      </button>
+      <div class="sub-btns" id="subRisk">
+        <button class="sub-btn random" onclick="startQuiz('risk', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('risk', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 全問セクション -->
+    <div class="section-block">
+      <button class="mode-btn all-btn" onclick="toggleSub('subAll', this)" id="btnAll">
+        <span class="btn-icon">📚</span>
+        <div>
+          <div class="btn-label">全問</div>
+          <div class="btn-sub">160問すべてを出題</div>
+        </div>
+        <span class="arrow" id="arrowAll">›</span>
+      </button>
+      <div class="sub-btns" id="subAll">
+        <button class="sub-btn random" onclick="startQuiz('all', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('all', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+    <!-- 難易度別 -->
+    <div class="section-title" style="margin-top:16px;">難易度・出題スタイル</div>
+    <div class="section-block">
+      <button class="mode-btn diff-easy-btn" onclick="toggleSub('subDiffEasy', this)" id="btnDiffEasy">
+        <span class="btn-icon">⭐</span>
+        <div>
+          <div class="btn-label">基礎レベル</div>
+          <div class="btn-sub">★ 基本知識・単純想起を中心に出題</div>
+        </div>
+        <span class="arrow" id="arrowDiffEasy">›</span>
+      </button>
+      <div class="sub-btns" id="subDiffEasy">
+        <button class="sub-btn random" onclick="startQuizByDifficulty(1, true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuizByDifficulty(1, false)">📋 順番通り</button>
+      </div>
+    </div>
+    <div class="section-block">
+      <button class="mode-btn diff-mid-btn" onclick="toggleSub('subDiffMid', this)" id="btnDiffMid">
+        <span class="btn-icon">⭐⭐</span>
+        <div>
+          <div class="btn-label">応用レベル</div>
+          <div class="btn-sub">★★ 薬物動態・安全性の応用問題</div>
+        </div>
+        <span class="arrow" id="arrowDiffMid">›</span>
+      </button>
+      <div class="sub-btns" id="subDiffMid">
+        <button class="sub-btn random" onclick="startQuizByDifficulty(2, true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuizByDifficulty(2, false)">📋 順番通り</button>
+      </div>
+    </div>
+    <div class="section-block">
+      <button class="mode-btn diff-hard-btn" onclick="toggleSub('subDiffHard', this)" id="btnDiffHard">
+        <span class="btn-icon">⭐⭐⭐</span>
+        <div>
+          <div class="btn-label">実践レベル</div>
+          <div class="btn-sub">★★★ 臨床判断・多職種連携の総合問題</div>
+        </div>
+        <span class="arrow" id="arrowDiffHard">›</span>
+      </button>
+      <div class="sub-btns" id="subDiffHard">
+        <button class="sub-btn random" onclick="startQuizByDifficulty(3, true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuizByDifficulty(3, false)">📋 順番通り</button>
+      </div>
+    </div>
+    <div class="section-block">
+      <button class="mode-btn clinical-btn" onclick="toggleSub('subClinical', this)" id="btnClinical">
+        <span class="btn-icon">🏨</span>
+        <div>
+          <div class="btn-label">臨床・実務問題</div>
+          <div class="btn-sub">30問 ｜ 国試実務スタイル・症例ベース</div>
+        </div>
+        <span class="arrow" id="arrowClinical">›</span>
+      </button>
+      <div class="sub-btns" id="subClinical">
+        <button class="sub-btn random" onclick="startQuiz('clinical', true)">🎲 ランダム</button>
+        <button class="sub-btn ordered" onclick="startQuiz('clinical', false)">📋 順番通り</button>
+      </div>
+    </div>
+
+        <!-- カテゴリ別 -->
+    <div class="section-block">
+      <button class="mode-btn" onclick="toggleCatList()" id="catToggleBtn">
+        <span class="btn-icon">🗂️</span>
+        <div>
+          <div class="btn-label">カテゴリ別</div>
+          <div class="btn-sub">分野を絞って出題</div>
+        </div>
+        <span class="arrow" id="catArrow">›</span>
+      </button>
+      <div class="cat-list" id="catList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 問題画面 ===== -->
+<div id="screenQuiz" class="screen">
+  <div class="app-header">
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p id="quizHeaderSub">問題中...</p>
+    </div>
+    <div class="header-right">
+      <button class="home-btn" onclick="goHome()">🏠 ホーム</button>
+    </div>
+  </div>
+  <div class="quiz-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="progress-text">
+      <span id="progressText">1 / 50</span>
+      <span id="scoreText">正解: 0</span>
+    </div>
+    <div class="category-badge" id="categoryBadge"></div>
+    <div class="question-card" id="questionText"></div>
+    <div class="choices" id="choicesWrap"></div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+    <div class="explanation-card" id="explanationCard">
+      <div class="exp-title">💡 解説</div>
+      <div id="explanationText"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">次の問題 →</button>
+  </div>
+</div>
+
+<!-- ===== 結果画面 ===== -->
+<div id="screenResult" class="screen">
+  <div class="app-header">
+    <div>
+      <h1>💊 薬理クイズ</h1>
+      <p>結果</p>
+    </div>
+    <div class="header-right">
+      <button class="home-btn" onclick="goHome()">🏠 ホーム</button>
+    </div>
+  </div>
+  <div class="result-wrap">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-denom" id="resultDenom">/ 0 問</div>
+      <div class="result-pct" id="resultPct">正答率 0%</div>
+      <div class="result-msg" id="resultMsg"></div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="startQuiz('all', true)">もう一度（全問ランダム）</button>
+      <button class="result-btn secondary" onclick="showScreen('screenStart')">トップに戻る</button>
+    </div>
+    <div class="answer-list" id="answerList"></div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  {id:1,difficulty:1,category:"解熱・鎮痛薬",question:"アセトアミノフェンの主な作用機序として最も適切なものはどれか。",choices:{A:"末梢のCOX-1を選択的に阻害する",B:"末梢のCOX-2を選択的に阻害する",C:"中枢のCOX-3（COX-1スプライスバリアント）を阻害する",D:"μオピオイド受容体を刺激する",E:"ロイコトリエン受容体を遮断する"},answer:"C",explanation:"アセトアミノフェンは主に中枢でのCOX-3阻害によって解熱・鎮痛効果を発揮する。末梢でのプロスタグランジン産生阻害作用は弱いため、抗炎症作用はほとんどなく、胃粘膜障害も少ない。"},
+  {id:2,difficulty:1,category:"解熱・鎮痛薬",question:"セレコキシブの特徴として正しいものはどれか。",choices:{A:"COX-1を選択的に阻害し、抗血小板作用が強い",B:"COX-2を選択的に阻害し、胃粘膜障害が少ない",C:"COX-1・COX-2の両方を均等に阻害する",D:"アラキドン酸の産生を阻害する",E:"ロイコトリエンの合成を阻害する"},answer:"B",explanation:"セレコキシブはCOX-2選択的阻害薬。COX-1を介した胃粘膜保護（PGE2産生）を温存するため、従来のNSAIDsに比べて消化管障害が少ない。ただし心血管リスクへの注意が必要。"},
+  {id:3,difficulty:1,category:"解熱・鎮痛薬",question:"イブプロフェン、ジクロフェナク、ロキソプロフェンに共通する作用機序はどれか。",choices:{A:"COX-1・COX-2の両方を非選択的に阻害してプロスタグランジン合成を抑制する",B:"ホスホリパーゼA2を阻害してアラキドン酸の遊離を抑制する",C:"トロンボキサンA2受容体を遮断する",D:"ブラジキニンB2受容体を遮断する",E:"5-リポキシゲナーゼを阻害する"},answer:"A",explanation:"これらは非ステロイド性抗炎症薬（NSAIDs）でありCOX-1・COX-2を非選択的に阻害する。アラキドン酸からプロスタグランジン・トロンボキサン産生を抑制することで解熱・鎮痛・抗炎症効果を発揮する。"},
+  {id:4,difficulty:1,category:"解熱・鎮痛薬",question:"インドメタシンを分娩前に使用する際、特に注意すべき胎児への副作用はどれか。",choices:{A:"動脈管早期閉鎖",B:"二分脊椎",C:"心室中隔欠損",D:"口蓋裂",E:"四肢形成不全"},answer:"A",explanation:"インドメタシン（NSAIDs）はプロスタグランジン合成を阻害するため、胎児の動脈管開存に必要なPGE2を減少させ動脈管の早期閉鎖を引き起こすことがある。妊娠32週以降の使用は特に注意が必要。"},
+  {id:5,difficulty:2,category:"降圧薬（Ca拮抗薬）",question:"アムロジピン・ニフェジピンの主な作用機序はどれか。",choices:{A:"L型電位依存性Caチャネルを遮断し、血管平滑筋を弛緩させる",B:"β1受容体を遮断して心拍出量を減少させる",C:"AT1受容体を遮断してアンジオテンシンIIの作用を抑制する",D:"ACEを阻害してアンジオテンシンIIの産生を抑制する",E:"α1受容体を遮断して末梢血管抵抗を低下させる"},answer:"A",explanation:"ジヒドロピリジン系Ca拮抗薬（アムロジピン・ニフェジピン）は血管平滑筋のL型Ca²⁺チャネルに選択性が高く、末梢血管拡張による降圧が主作用。心臓への作用は弱い。ニカルジピンも同系統。"},
+  {id:6,difficulty:2,category:"降圧薬（Ca拮抗薬）",question:"ジルチアゼムがニフェジピンと異なる点はどれか。",choices:{A:"L型CaチャネルのみでなくT型Caチャネルも強く阻害する",B:"心臓（洞結節・房室結節）にも抑制作用を示し、頻脈を起こしにくい",C:"血管よりも心臓に選択性が高く、血圧低下作用は弱い",D:"COX-2阻害作用を併せ持つ",E:"腎臓でのNa再吸収を抑制する"},answer:"B",explanation:"ジルチアゼムはベンゾチアゼピン系Ca拮抗薬で、血管と心臓の両方に作用する。洞結節・房室結節のCaチャネルも阻害するため心拍数を低下させ、反射性頻脈が起こりにくい。これはジヒドロピリジン系との大きな違い。"},
+  {id:7,difficulty:2,category:"降圧薬（ACE阻害薬）",question:"エナラプリル・カプトプリルの作用機序として正しいものはどれか。",choices:{A:"アンジオテンシンI→IIへの変換を触媒するACEを阻害する",B:"アンジオテンシンII受容体（AT1）を遮断する",C:"アルドステロンと競合してミネラルコルチコイド受容体を遮断する",D:"レニンの分泌を直接抑制する",E:"β1受容体を遮断してレニン分泌を減少させる"},answer:"A",explanation:"ACE阻害薬はアンジオテンシン変換酵素（ACE）を阻害し、アンジオテンシンIIの産生を抑制する。同時にブラジキニンの分解も抑制するため（ACEはキニナーゼII）空咳の副作用が生じる。"},
+  {id:8,difficulty:2,category:"降圧薬（ARB）",question:"カンデサルタンの作用点はどれか。",choices:{A:"ACE（アンジオテンシン変換酵素）",B:"AT1受容体（アンジオテンシンII 1型受容体）",C:"AT2受容体（アンジオテンシンII 2型受容体）",D:"アルドステロン受容体",E:"レニン"},answer:"B",explanation:"ARB（アンジオテンシンII受容体拮抗薬）はAT1受容体を選択的に遮断する。ACE阻害薬とは異なりブラジキニン代謝には影響しないため空咳の副作用が少ない。AT2受容体は遮断しない（AT2刺激は臓器保護的）。"},
+  {id:9,difficulty:2,category:"降圧薬（β遮断薬）",question:"プロプラノロールとビソプロロールの違いとして正しいものはどれか。",choices:{A:"プロプラノロールはβ1選択性が高く、ビソプロロールは非選択的である",B:"ビソプロロールはβ1選択性が高く、プロプラノロールはβ1・β2の両方を遮断する",C:"両者ともβ1選択性が高い",D:"プロプラノロールはα1も遮断するため起立性低血圧を起こしやすい",E:"ビソプロロールはISA（内因性交感神経刺激活性）を持つ"},answer:"B",explanation:"プロプラノロールは非選択的β遮断薬（β1・β2遮断）。β2遮断により気管支収縮が生じるため喘息患者には禁忌。ビソプロロールはβ1選択的β遮断薬で気管支への影響が少ない。ラベタロールはα1+β遮断の複合型。"},
+  {id:10,difficulty:2,category:"降圧薬（その他）",question:"ラベタロールは複数の受容体に作用する。正しい組み合わせはどれか。",choices:{A:"α1受容体遮断＋β1受容体遮断",B:"α1受容体遮断＋β1・β2受容体遮断",C:"α1・α2受容体遮断＋β1受容体遮断",D:"α2受容体遮断＋β1受容体遮断",E:"α1受容体刺激＋β1受容体遮断"},answer:"B",explanation:"ラベタロールはα1受容体＋β1・β2受容体をすべて遮断する複合型遮断薬。α1遮断による末梢血管拡張とβ遮断による心拍出量減少の両方で降圧する。妊娠高血圧症候群にも使用される。"},
+  {id:11,difficulty:2,category:"利尿薬",question:"スピロノラクトンの作用機序として正しいものはどれか。",choices:{A:"遠位尿細管のNa/K/2Cl共輸送体を阻害する",B:"近位尿細管の炭酸脱水素酵素を阻害する",C:"集合管でアルドステロン受容体（ミネラルコルチコイド受容体）と競合的に拮抗する",D:"集合管のADH（バソプレシン）受容体を遮断する",E:"糸球体でのナトリウム再吸収を直接抑制する"},answer:"C",explanation:"スピロノラクトンはアルドステロン拮抗薬（カリウム保持性利尿薬）。集合管でアルドステロン（ミネラルコルチコイド）受容体と競合してNa再吸収を抑制し、K排泄を減少させる。高カリウム血症に注意。"},
+  {id:12,difficulty:2,category:"利尿薬",question:"アセタゾラミドの作用機序はどれか。",choices:{A:"ヘンレ係蹄上行脚のNa-K-2Cl共輸送体を阻害",B:"近位尿細管の炭酸脱水素酵素（CA）を阻害しNaHCO3の再吸収を抑制",C:"集合管のアルドステロン受容体を遮断",D:"遠位尿細管のNaCl共輸送体を阻害",E:"糸球体濾過率を直接増加させる"},answer:"B",explanation:"アセタゾラミドは炭酸脱水素酵素阻害薬。近位尿細管でH⁺産生が減少し、NaHCO3の再吸収が抑制される。代謝性アシドーシスを引き起こすことがある。緑内障（眼内圧低下）、高山病予防にも使用。"},
+  {id:13,difficulty:3,category:"強心薬・抗不整脈薬",question:"ジゴキシンの主な作用機序はどれか。",choices:{A:"β1受容体を刺激してcAMPを増加させる",B:"心筋細胞膜のNa⁺/K⁺-ATPase（Naポンプ）を阻害する",C:"L型CaチャネルのCa²⁺流入を増加させる",D:"K⁺チャネルを遮断して活動電位を延長する",E:"PDE（ホスホジエステラーゼ）III阻害によりcAMPを増加させる"},answer:"B",explanation:"ジゴキシンはNa⁺/K⁺-ATPaseを阻害し、細胞内Na⁺増加→Na⁺/Ca²⁺交換輸送体（NCX）の逆方向活性化→細胞内Ca²⁺増加→心筋収縮力増強（陽性変力作用）を示す。また迷走神経刺激を介して房室伝導を抑制（陰性変時・変伝導作用）。"},
+  {id:14,difficulty:3,category:"抗不整脈薬",question:"フレカイニドの主な作用機序と分類はどれか。",choices:{A:"Kチャネル遮断（クラスIII）",B:"Naチャネル遮断（クラスIC）",C:"β受容体遮断（クラスII）",D:"Caチャネル遮断（クラスIV）",E:"洞結節自動能の抑制（クラスV）"},answer:"B",explanation:"フレカイニドはVaughan Williams分類クラスICのNaチャネル遮断薬。活動電位の立ち上がり（phase 0）を遅延させ、伝導速度を低下させる。上室性・心室性不整脈に使用。"},
+  {id:15,difficulty:3,category:"抗不整脈薬",question:"ベラパミルの作用と、プロプラノロールとの比較として正しいものはどれか。",choices:{A:"ベラパミルはNaチャネル遮断、プロプラノロールはKチャネル遮断",B:"ベラパミルはL型CaチャネルをCaチャネル遮断（クラスIV）、プロプラノロールはβ受容体遮断（クラスII）",C:"両者ともKチャネルを遮断して活動電位を延長する",D:"ベラパミルは洞結節に作用せずプロプラノロールのみ洞結節を抑制する",E:"両者の作用機序は同一で効力の差のみある"},answer:"B",explanation:"ベラパミルはクラスIVのCaチャネル遮断薬で、洞結節・房室結節のCa依存性活動電位を抑制する。プロプラノロールはクラスIIのβ遮断薬。両者は房室結節抑制作用があるため、併用は危険（高度徐脈・房室ブロック）。"},
+  {id:16,difficulty:2,category:"抗凝固薬",question:"ワルファリンの作用機序として正しいものはどれか。",choices:{A:"トロンビンを直接阻害する",B:"活性化第X因子（FXa）を直接阻害する",C:"ビタミンKエポキシド還元酵素を阻害し、ビタミンK依存性凝固因子（II、VII、IX、X因子）の合成を阻害する",D:"アンチトロンビンIIIを活性化してトロンビンを不活化する",E:"血小板のADP受容体（P2Y12）を遮断する"},answer:"C",explanation:"ワルファリンはビタミンKエポキシド還元酵素（VKOR）を阻害し、ビタミンKの再生を阻害する。その結果、ビタミンK依存性凝固因子（II・VII・IX・X因子、プロテインC・S）の活性型γカルボキシル化が阻害され、凝固能が低下する。"},
+  {id:17,difficulty:2,category:"抗凝固薬",question:"ダルテパリン（低分子ヘパリン）の作用機序はどれか。",choices:{A:"ビタミンK拮抗によって凝固因子合成を阻害する",B:"アンチトロンビンIII（AT-III）と結合してXa因子およびIIa因子（トロンビン）を不活化する（Xa阻害優位）",C:"トロンビンのフィブリノーゲン結合部位を直接遮断する",D:"血小板のGPIIb/IIIa受容体を遮断する",E:"プラスミノーゲンを活性化してフィブリンを溶解する"},answer:"B",explanation:"低分子ヘパリン（LMWH）はAT-IIIに結合してXa因子を主に阻害（Xa:IIa阻害比＝約2:1〜4:1）。未分画ヘパリンと比べてXa阻害優位で皮下注射可能、半減期が長い。プロタミンによる中和はXa阻害には部分的。"},
+  {id:18,difficulty:1,category:"消化器系薬（PPI）",question:"オメプラゾール・エソメプラゾールの作用機序として正しいものはどれか。",choices:{A:"胃壁細胞のH2受容体を遮断してヒスタミン刺激を遮断する",B:"胃壁細胞のH⁺/K⁺-ATPase（プロトンポンプ）を不可逆的に阻害して胃酸分泌を抑制する",C:"ムスカリンM1受容体を遮断してアセチルコリン刺激を遮断する",D:"ガストリン受容体を遮断して胃酸分泌を抑制する",E:"ソマトスタチン受容体を刺激して胃酸分泌を抑制する"},answer:"B",explanation:"PPI（プロトンポンプ阻害薬）は酸性環境でスルフェンアミドに変換され、胃壁細胞のH⁺/K⁺-ATPaseのSH基と共有結合して不可逆的に阻害する。H2遮断薬より強力で持続的な胃酸分泌抑制効果を示す。"},
+  {id:19,difficulty:1,category:"消化器系薬（H2受容体拮抗薬）",question:"ファモチジン・シメチジンの作用はどれか。",choices:{A:"プロトンポンプ（H⁺/K⁺-ATPase）を直接阻害する",B:"胃壁細胞のH2受容体を競合的に遮断してヒスタミンによる胃酸分泌を抑制する",C:"ムスカリン受容体を遮断する",D:"ガストリン受容体を遮断する",E:"プロスタグランジンE2受容体を刺激して胃粘膜を保護する"},answer:"B",explanation:"H2受容体拮抗薬は胃壁細胞のH2受容体（Gs共役型）をブロックし、ヒスタミン→アデニルシクラーゼ→cAMP→プロテインキナーゼA→H⁺/K⁺-ATPase活性化の経路を遮断する。シメチジンはCYP阻害（CYP1A2、2C9、3A4等）に注意。"},
+  {id:20,difficulty:1,category:"消化器系薬（腸管運動）",question:"メトクロプラミド・ドンペリドンの制吐作用の主な機序はどれか。",choices:{A:"5-HT3受容体を遮断して中枢性嘔吐を抑制する",B:"D2受容体（ドパミンD2受容体）を遮断して化学受容器誘発帯（CTZ）への刺激を抑制する",C:"H1受容体を遮断して前庭からの刺激を抑制する",D:"ムスカリンM1受容体を遮断する",E:"オピオイドμ受容体を遮断する"},answer:"B",explanation:"メトクロプラミドとドンペリドンはD2受容体拮抗薬。CTZ（化学受容器誘発帯）はD2受容体が豊富で、ここを遮断することで制吐・胃排出促進（上部消化管の蠕動促進）効果を示す。メトクロプラミドは血液脳関門を通過するため錐体外路症状のリスクがある。"},
+  {id:21,difficulty:1,category:"抗ヒスタミン薬",question:"セチリジン・フェキソフェナジン・ロラタジンが第1世代抗ヒスタミン薬（ジフェンヒドラミン等）と異なる点はどれか。",choices:{A:"H1受容体に作用せずロイコトリエン受容体を遮断する",B:"血液脳関門を通過しにくく中枢性の眠気が少ない（第2世代）",C:"抗ムスカリン作用が強く口渇・尿閉を起こしやすい",D:"H2受容体にも作用して胃酸分泌を抑制する",E:"ケミカルメディエーター遊離を抑制する作用のみを持つ"},answer:"B",explanation:"第2世代抗ヒスタミン薬（セチリジン・フェキソフェナジン・ロラタジン・デスロラタジン・レボセチリジン）は脂溶性が低く血液脳関門を透過しにくいため、中枢抑制（眠気）が少ない。抗ムスカリン作用も弱い。"},
+  {id:22,difficulty:1,category:"抗アレルギー薬",question:"モンテルカストの作用機序はどれか。",choices:{A:"肥満細胞からのヒスタミン遊離を抑制する",B:"H1受容体を遮断してアレルギー症状を抑制する",C:"システイニルロイコトリエン受容体（CysLT1受容体）を遮断する",D:"IgEのFcεRI受容体への結合を阻害する",E:"5-リポキシゲナーゼを阻害してロイコトリエン産生を抑制する"},answer:"C",explanation:"モンテルカストはCysLT1（システイニルロイコトリエン1型）受容体拮抗薬。気管支喘息・アレルギー性鼻炎に使用。ロイコトリエン（LTC4・LTD4・LTE4）による気管支収縮・粘液分泌を抑制する。"},
+  {id:23,difficulty:3,category:"免疫抑制薬",question:"シクロスポリン・タクロリムスに共通する作用機序はどれか。",choices:{A:"プリン合成を阻害してリンパ球増殖を抑制する",B:"カルシニューリン（ホスファターゼ）を阻害してIL-2産生を抑制する",C:"mTORを阻害してT細胞活性化を抑制する",D:"TNF-αと直接結合して中和する",E:"DNA二重鎖を架橋してDNA複製を阻害する"},answer:"B",explanation:"シクロスポリン・タクロリムスはともにカルシニューリン阻害薬。シクロスポリンはシクロフィリン、タクロリムスはFKBP12と結合した複合体がカルシニューリン（ホスファターゼ）を阻害し、NFAT（活性化T細胞核因子）の核内移行を阻止→IL-2産生抑制→T細胞活性化抑制。"},
+  {id:24,difficulty:3,category:"免疫抑制薬",question:"アザチオプリンの作用機序はどれか。",choices:{A:"カルシニューリンを阻害してIL-2産生を抑制する",B:"体内で6-メルカプトプリン（6-MP）に変換され、プリン合成を阻害してDNA合成・リンパ球増殖を抑制する",C:"mTOR阻害によりT細胞の増殖シグナルを遮断する",D:"葉酸代謝を阻害してDNA合成を抑制する",E:"TNF-αに対するモノクローナル抗体として機能する"},answer:"B",explanation:"アザチオプリンは体内で6-MPに変換され、ヌクレオシドとしてプリン合成経路に取り込まれてDNA合成を阻害する。増殖の活発なリンパ球に強く作用。骨髄抑制（白血球減少）に注意。TPMT酵素の活性が低い患者では毒性が増強。"},
+  {id:25,difficulty:3,category:"生物学的製剤（抗リウマチ薬）",question:"アダリムマブ・インフリキシマブ・ゴリムマブに共通する作用はどれか。",choices:{A:"IL-6受容体を遮断する",B:"TNF-α（腫瘍壊死因子α）を中和する",C:"B細胞のCD20抗原に結合してB細胞を除去する",D:"T細胞の共刺激シグナル（CD80/86-CD28）を阻害する",E:"JAK（ヤヌスキナーゼ）を阻害してサイトカインシグナルを遮断する"},answer:"B",explanation:"アダリムマブ・インフリキシマブ・ゴリムマブ・セルトリズマブペゴルはすべてTNF-α阻害薬（抗TNF製剤）。可溶型・膜型TNF-αに結合して中和し、関節破壊に関わる炎症カスケードを抑制。結核の再活性化リスクに注意（投与前にTBスクリーニングが必須）。"},
+  {id:26,difficulty:3,category:"生物学的製剤（抗リウマチ薬）",question:"トシリズマブの作用機序として正しいものはどれか。",choices:{A:"TNF-αを直接中和する",B:"IL-6受容体（IL-6R）を遮断してIL-6シグナルを阻害する",C:"B細胞を選択的に除去する",D:"T細胞共刺激を阻害する",E:"インターロイキン-1受容体を遮断する"},answer:"B",explanation:"トシリズマブはヒト化抗IL-6受容体モノクローナル抗体。可溶型・膜型のIL-6受容体に結合してIL-6シグナル伝達を阻害する。RAの炎症・関節破壊に深く関わるIL-6経路を選択的にブロック。CRP低下が顕著。"},
+  {id:27,difficulty:2,category:"抗菌薬（βラクタム系）",question:"アモキシシリン・アンピシリン・ベンジルペニシリン・セファロスポリン系に共通する作用機序はどれか。",choices:{A:"細菌のDNAジャイレース（トポイソメラーゼII）を阻害する",B:"細菌のリボソーム50Sサブユニットに結合してタンパク質合成を阻害する",C:"ペニシリン結合タンパク（PBP）に結合して細胞壁ペプチドグリカン合成（架橋形成）を阻害する",D:"細菌の細胞膜を障害して内容物を漏出させる",E:"葉酸合成酵素を阻害して核酸合成を抑制する"},answer:"C",explanation:"βラクタム系抗菌薬（ペニシリン・セファロスポリン・カルバペネム系）はすべてPBP（ペニシリン結合タンパク質、トランスペプチダーゼ）に不可逆的に結合し、細胞壁ペプチドグリカンの架橋形成を阻害する。MRSAはPBP2a（mecA遺伝子産物）を産生してβラクタムへの親和性が低下するため耐性。"},
+  {id:28,difficulty:3,category:"抗菌薬（グリコペプチド系）",question:"バンコマイシンの作用機序はどれか。",choices:{A:"PBPに結合してペプチドグリカン架橋を阻害する",B:"ペプチドグリカン前駆体のD-Ala-D-Ala末端に結合してトランスグリコシラーゼ・トランスペプチダーゼ反応を阻害する",C:"50Sリボソームサブユニットに結合する",D:"DNAジャイレースを阻害する",E:"細胞膜に挿入されてイオンチャネルを形成する"},answer:"B",explanation:"バンコマイシン（グリコペプチド系）はペプチドグリカン前駆体のD-Ala-D-Ala配列に結合し、細胞壁合成に必要なトランスグリコシラーゼおよびトランスペプチダーゼ反応を立体障害で阻害する。MRSA・VREに対して使用されるが、VRE（バンコマイシン耐性腸球菌）はD-Ala-D-Lacに変化して耐性化。"},
+  {id:29,difficulty:2,category:"抗菌薬（マクロライド系）",question:"エリスロマイシン・クラリスロマイシン・アジスロマイシン・ロキシスロマイシンの作用機序はどれか。",choices:{A:"細菌の30Sリボソームサブユニットに結合してタンパク質合成を阻害する",B:"細菌の50Sリボソームサブユニットに結合してmRNAの転移（トランスロケーション）を阻害する",C:"DNAジャイレース（トポイソメラーゼII）を阻害する",D:"細菌のRNAポリメラーゼを阻害する",E:"葉酸合成を阻害する"},answer:"B",explanation:"マクロライド系抗菌薬は細菌の50Sリボソームサブユニットの23S rRNAに結合し、ペプチジルtRNAのトランスロケーション（P部位→E部位移動）を阻害してタンパク質合成を停止させる。非典型病原体（マイコプラズマ・クラミジア・レジオネラ）に有効。"},
+  {id:30,difficulty:2,category:"抗菌薬（キノロン系）",question:"シプロフロキサシン・レボフロキサシン・ノルフロキサシン・オフロキサシンの作用機序はどれか。",choices:{A:"30Sリボソームサブユニットに結合してタンパク質合成を阻害する",B:"DNAジャイレース（トポイソメラーゼII）とトポイソメラーゼIVを阻害してDNA複製を阻害する",C:"RNAポリメラーゼを阻害する",D:"細胞壁ペプチドグリカン合成を阻害する",E:"葉酸合成を阻害する"},answer:"B",explanation:"フルオロキノロン系はDNAジャイレース（グラム陰性菌で主標的）およびトポイソメラーゼIV（グラム陽性菌で主標的）を阻害し、DNA超らせん構造の制御を障害してDNA複製・転写・修復を阻止する。"},
+  {id:31,difficulty:3,category:"抗菌薬（抗結核薬）",question:"イソニアジドの作用機序として正しいものはどれか。",choices:{A:"DNAジャイレースを阻害する",B:"50Sリボソームサブユニットを阻害する",C:"ミコール酸（mycolic acid）合成を阻害して結核菌の細胞壁合成を障害する",D:"RNAポリメラーゼを阻害する",E:"アラビノガラクタン合成を阻害する"},answer:"C",explanation:"イソニアジドはInhAおよびKatGを介してミコール酸合成を阻害し、結核菌特有の細胞壁成分を障害する。副作用として末梢神経障害（ビタミンB6欠乏）があり、ピリドキシン（B6）併用で予防する。リファンピシンはRNAポリメラーゼ（β-サブユニット）阻害、エタンブトールはアラビノシルトランスフェラーゼ阻害。"},
+  {id:32,difficulty:2,category:"抗菌薬（クリンダマイシン）",question:"クリンダマイシンの作用機序と主な適応菌種として正しいものはどれか。",choices:{A:"DNAジャイレース阻害、グラム陰性菌に有効",B:"50Sリボソームサブユニット阻害（23S rRNAのペプチジルトランスフェラーゼ部位）、嫌気性菌・グラム陽性菌に有効",C:"30Sリボソームサブユニット阻害、グラム陰性菌に有効",D:"細胞壁合成阻害、MRSAに有効",E:"DNAインターカレーション、グラム陽性菌に有効"},answer:"B",explanation:"クリンダマイシン（リンコマイシン系）は50Sリボソームのペプチジルトランスフェラーゼセンターに結合してペプチド結合形成を阻害する。嫌気性菌・ブドウ球菌・連鎖球菌などグラム陽性菌に有効。偽膜性腸炎（C. difficile）のリスクが高い。"},
+  {id:33,difficulty:2,category:"抗ウイルス薬",question:"アシクロビル・バラシクロビルの作用機序として正しいものはどれか。",choices:{A:"ウイルスのNAを阻害してウイルスの細胞外放出を阻害する",B:"ウイルスのM2プロトンチャネルを阻害してウイルス脱核を阻害する",C:"ウイルスチミジンキナーゼにより活性化（リン酸化）され、ウイルスDNAポリメラーゼを阻害する",D:"逆転写酵素を阻害する",E:"HIVプロテアーゼを阻害する"},answer:"C",explanation:"アシクロビルはHSV/VZVのチミジンキナーゼ（TK）によりモノリン酸化→宿主細胞酵素によりトリリン酸化→ウイルスDNAポリメラーゼを競合的に阻害・DNAへの取り込みでチェーン終止。TKを持たない宿主細胞では活性化されないため選択毒性が高い。バラシクロビルはアシクロビルのプロドラッグ（経口バイオアベイラビリティ改善）。"},
+  {id:34,difficulty:2,category:"抗ウイルス薬",question:"オセルタミビルの作用機序として正しいものはどれか。",choices:{A:"インフルエンザウイルスのM2プロトンチャネルを阻害する",B:"ウイルスのRNAポリメラーゼを阻害する",C:"ウイルス表面のノイラミニダーゼ（NA）を阻害して感染細胞からのウイルス放出を抑制する",D:"ウイルスの赤血球凝集素（HA）に結合して細胞への吸着を阻害する",E:"宿主細胞のACE2受容体をブロックする"},answer:"C",explanation:"オセルタミビル（タミフル）はノイラミニダーゼ阻害薬。インフルエンザウイルスのNA酵素を阻害することで、感染細胞表面のシアル酸からのウイルス粒子の切断・放出を阻害し、ウイルスの拡散を防ぐ。発症48時間以内の投与が有効。"},
+  {id:35,difficulty:2,category:"抗真菌薬",question:"フルコナゾール・イトラコナゾールの共通する作用機序はどれか。",choices:{A:"真菌細胞膜のエルゴステロールに直接結合して細胞膜を障害する",B:"真菌のβ-1,3-グルカン合成酵素を阻害する",C:"真菌のラノステロール14α-脱メチル化酵素（CYP51）を阻害してエルゴステロール合成を抑制する",D:"真菌のDNAポリメラーゼを阻害する",E:"真菌の細胞壁キチン合成を阻害する"},answer:"C",explanation:"アゾール系抗真菌薬（フルコナゾール・イトラコナゾール）はCYP51（ラノステロール14α-脱メチラーゼ）を阻害し、エルゴステロール（真菌細胞膜の主要ステロール）合成を抑制する。CYP酵素を阻害するため多くの薬物相互作用に注意。"},
+  {id:36,difficulty:2,category:"偏頭痛治療薬",question:"スマトリプタン・ゾルミトリプタン・エレトリプタン（トリプタン系）の作用機序はどれか。",choices:{A:"COX-2を選択的に阻害して頭痛を抑制する",B:"5-HT1B/1D受容体を刺激して頭蓋内血管を収縮させ、神経ペプチド放出を抑制する",C:"ドパミンD2受容体を遮断して制吐・鎮痛効果を示す",D:"5-HT3受容体を遮断して嘔吐中枢を抑制する",E:"NMDAグルタミン酸受容体を遮断して中枢性痛覚を抑制する"},answer:"B",explanation:"トリプタン系は5-HT1B受容体（頭蓋内血管平滑筋）と5-HT1D受容体（三叉神経末梢）を刺激する選択的作動薬。①血管収縮、②CGRP・サブスタンスPなど神経原性炎症ペプチドの遊離抑制、③三叉神経核での痛覚伝達抑制の3つの機序で片頭痛を改善する。"},
+  {id:37,difficulty:2,category:"糖尿病治療薬",question:"インスリンの細胞内シグナル伝達として正しいものはどれか。",choices:{A:"Gタンパク質共役受容体→アデニルシクラーゼ→cAMP増加",B:"チロシンキナーゼ型受容体→IRS-1リン酸化→PI3K→Akt活性化→グルコーストランスポーター（GLUT4）の細胞膜への移行",C:"イオンチャネル型受容体→Na⁺流入→膜脱分極",D:"核内受容体（ステロイドホルモン型）→転写調節",E:"グアニル酸シクラーゼ型受容体→cGMP増加"},answer:"B",explanation:"インスリン受容体はチロシンキナーゼ内蔵型受容体。インスリン結合→受容体の自己リン酸化→IRS（インスリン受容体基質）リン酸化→PI3K/AktおよびMAPKカスケード活性化→GLUT4含む小胞が細胞膜に融合してグルコース取り込み増加（筋肉・脂肪）。"},
+  {id:38,difficulty:2,category:"甲状腺ホルモン薬",question:"レボチロキシン（T4）とリオチロニン（T3）の違いとして正しいものはどれか。",choices:{A:"T4は作用が速く、T3は作用が遅い",B:"T4の多くは末梢組織で脱ヨード化酵素によりT3に変換されて活性化される（T4はプロドラッグ的）",C:"T3は核内受容体（TR）に結合せずサイトゾルに留まる",D:"T4はGタンパク質共役受容体を介してcAMPを増加させる",E:"T3は細胞膜受容体に結合して即時的に作用する"},answer:"B",explanation:"甲状腺ホルモン受容体（TR）は核内受容体（リガンド依存性転写因子）。T4は末梢組織（肝・腎・筋肉）で脱ヨード化酵素（type 1, 2 deiodinase）によりT3に変換されてはじめて強い活性を示す。T4は半減期が長く（約7日）、T3は半減期が短く（約1日）、速効性がある。"},
+  {id:39,difficulty:2,category:"吸入ステロイド薬",question:"ブデソニドの抗喘息作用の主な機序として正しいものはどれか。",choices:{A:"β2受容体を刺激して気管支平滑筋を弛緩させる",B:"グルココルチコイド受容体（GR）に結合して抗炎症遺伝子の転写を促進し、炎症性サイトカイン産生を抑制する",C:"ロイコトリエン受容体を遮断する",D:"IgEのFcεRI受容体への結合を阻害する",E:"5-リポキシゲナーゼを阻害する"},answer:"B",explanation:"吸入コルチコステロイド（ICS）は細胞内のグルココルチコイド受容体（GR）に結合し、GR-GRE（グルココルチコイド応答配列）複合体が抗炎症タンパク（リポコルチン1等）の転写を促進し、炎症性サイトカイン（IL-4, IL-5, IL-13等）・ケモカイン産生を抑制。吸入製剤は局所作用が主で全身副作用が少ない。"},
+  {id:40,difficulty:3,category:"成長ホルモン薬",question:"ソマトロピン（成長ホルモン：GH）の受容体は何型か。",choices:{A:"Gタンパク質共役型受容体（GPCR）",B:"チロシンキナーゼ内蔵型受容体",C:"サイトカイン受容体（クラス1サイトカイン受容体）→JAK2-STAT5シグナル",D:"核内受容体",E:"イオンチャネル型受容体"},answer:"C",explanation:"GH受容体はクラスI型サイトカイン受容体ファミリーに属する。GH結合→受容体二量体化→JAK2（ヤヌスキナーゼ2）の活性化→STAT5リン酸化→核内移行→IGF-1（インスリン様成長因子-1）等の転写促進。"},
+  {id:41,difficulty:1,category:"消化器系薬",question:"センノシド（センナ）の下剤としての作用機序はどれか。",choices:{A:"腸管の浸透圧を高めて腸内に水分を引き込む（浸透圧性下剤）",B:"大腸でアンスラキノン（レインアンスロン）に変換されてNa⁺/K⁺-ATPaseを阻害し腸管運動を亢進させる（刺激性下剤）",C:"腸管粘膜を油膜で覆って便を軟化させる（潤滑性下剤）",D:"水分吸収を増加させて腸内容物を膨張させる（膨張性下剤）",E:"5-HT4受容体を刺激して腸管蠕動を促進する"},answer:"B",explanation:"センノシドは大腸内の腸内細菌により活性代謝物（レインアンスロン）に変換される。これが大腸粘膜のNa⁺/K⁺-ATPaseを阻害してNa⁺・水の吸収を抑制し、さらに腸管粘膜を直接刺激して蠕動運動を亢進させる（刺激性下剤）。習慣性に注意。"},
+  {id:42,difficulty:2,category:"抗寄生虫薬",question:"イベルメクチンの作用機序はどれか。",choices:{A:"寄生虫のDHFR（ジヒドロ葉酸還元酵素）を阻害する",B:"線虫のグルタミン酸依存性Cl⁻チャネル（GluCl）を活性化して虫体を麻痺させる",C:"寄生虫のヘモグロビン消化を阻害する",D:"寄生虫のβ-チューブリン重合を阻害する",E:"寄生虫のミトコンドリア呼吸鎖を阻害する"},answer:"B",explanation:"イベルメクチンは線虫・節足動物のグルタミン酸依存性Cl⁻チャネル（GluCl）を活性化し持続的に開口させる。Cl⁻流入による過分極が神経筋接合部を麻痺させ虫体を死滅させる。哺乳類のGABA作動性Cl⁻チャネルへの親和性は低く、選択的毒性がある。アルベンダゾールはβ-チューブリン阻害。"},
+  {id:43,difficulty:2,category:"降圧薬（メチルドパ）",question:"メチルドパの降圧機序として正しいものはどれか。",choices:{A:"α1受容体を遮断して末梢血管抵抗を低下させる",B:"β1受容体を遮断して心拍出量を低下させる",C:"中枢でα-メチルノルアドレナリン（偽性神経伝達物質）に変換されてα2受容体を刺激し、交感神経活動を抑制する",D:"ACEを阻害してアンジオテンシンII産生を抑制する",E:"Na⁺/K⁺-ATPaseを阻害する"},answer:"C",explanation:"メチルドパは脳内でDOPA脱炭酸酵素によりα-メチルドーパミン→α-メチルノルアドレナリンに変換される。これが脳幹（孤束核）のα2受容体（Gi共役）を刺激して交感神経中枢活動を抑制し、血圧・心拍数を低下させる。妊娠高血圧症候群の第一選択薬として使用される。"},
+  {id:44,difficulty:2,category:"降圧薬（直接血管拡張薬）",question:"ヒドララジンの降圧機序はどれか。",choices:{A:"中枢α2受容体刺激",B:"末梢α1受容体遮断",C:"血管平滑筋に直接作用してcGMPを増加させ、血管を拡張させる（直接性血管拡張薬）",D:"ACEを阻害する",E:"Lチャネル遮断"},answer:"C",explanation:"ヒドララジンは動脈平滑筋に直接作用して血管拡張を引き起こす直接作用型血管拡張薬。cGMP増加やK⁺チャネル開口などの機序が関与する。反射性頻脈・体液貯留が生じやすいため、β遮断薬や利尿薬と併用されることが多い。妊娠高血圧症候群の静注薬として使用。"},
+  {id:45,difficulty:2,category:"抗菌薬（キノロン系）",question:"フルオロキノロン系抗菌薬（シプロフロキサシン・レボフロキサシン等）を妊婦・小児に原則使用しない理由として最も適切なものはどれか。",choices:{A:"催奇形性（葉酸代謝阻害による神経管閉鎖障害）",B:"未熟な肝酵素（グルクロン酸転移酵素）による代謝障害",C:"未成熟な軟骨への毒性（関節症）を引き起こす可能性",D:"赤芽球症（ビリルビン置換による核黄疸）",E:"乳歯・永久歯の着色（カルシウムとのキレート形成）"},answer:"C",explanation:"動物実験でフルオロキノロン系は負荷軟骨（荷重関節）の軟骨障害（関節症）を引き起こすことが示されており、成長期の小児には原則禁忌。同様の理由で妊婦への投与も慎重。ドキシサイクリン（テトラサイクリン系）はCaとキレートを形成して歯牙着色を引き起こす（選択肢E）。"},
+  {id:46,difficulty:1,category:"消化器系薬",question:"ウルソデオキシコール酸（UDCA）の肝臓・胆道への作用として正しいものはどれか。",choices:{A:"胆汁酸の腸肝循環を遮断して胆汁酸の体内蓄積を減少させる",B:"疎水性胆汁酸（細胞毒性が高い）と置換されて胆汁組成を改善し、肝細胞保護・胆石溶解作用を示す",C:"胆のう平滑筋を収縮させて胆汁の排出を促進する",D:"オッジ括約筋を弛緩させる",E:"コレステロール合成酵素（HMG-CoA還元酵素）を阻害する"},answer:"B",explanation:"UDCAは親水性（細胞毒性が低い）の胆汁酸であり、体内の疎水性胆汁酸（コール酸・ケノデオキシコール酸等）の割合を低下させて胆汁を無毒化する。また胆汁中コレステロール飽和度を低下させてコレステロール胆石を溶解する作用もある。"},
+  {id:47,difficulty:2,category:"抗菌薬（テトラサイクリン系）",question:"ドキシサイクリン（テトラサイクリン系）の作用機序はどれか。",choices:{A:"細菌の50Sリボソームサブユニットに結合する",B:"細菌の30Sリボソームサブユニットに結合してアミノアシルtRNAのA部位への結合を阻害する",C:"DNAジャイレースを阻害する",D:"PBPに結合して細胞壁合成を阻害する",E:"細菌のRNAポリメラーゼを阻害する"},answer:"B",explanation:"テトラサイクリン系は細菌の30Sリボソームサブユニットに結合し、アミノアシルtRNAがA部位へ到達するのを阻害してタンパク質合成を抑制する。小児の歯牙着色・骨発育障害のため8歳未満・妊婦には原則禁忌。"},
+  {id:48,difficulty:1,category:"鎮咳薬",question:"デキストロメトルファンの鎮咳作用の機序として正しいものはどれか。",choices:{A:"末梢の咳受容体（迷走神経求心路）に作用する",B:"中枢の咳中枢（延髄）に作用してμオピオイド受容体を刺激する",C:"延髄の咳中枢にあるNMDA受容体拮抗・シグマ受容体刺激で咳反射を抑制する（非麻薬性）",D:"気管支を拡張させて咳刺激を軽減する",E:"気道分泌を促進して喀出を容易にする"},answer:"C",explanation:"デキストロメトルファンはモルヒナン骨格を持つ非麻薬性中枢性鎮咳薬。μオピオイド受容体への親和性は低く、NMDA受容体拮抗とシグマ受容体作動により咳中枢を抑制する。通常量では依存性・呼吸抑制がほとんどない。"},
+  {id:49,difficulty:2,category:"ホルモン薬",question:"デスモプレシンの主な作用はどれか。",choices:{A:"アルドステロン受容体を刺激してNa再吸収を促進する",B:"V2受容体（バソプレシン2型受容体）を刺激して集合管での水再吸収を増加させる",C:"V1受容体を刺激して血管収縮と血圧上昇を引き起こす",D:"GnRH受容体を脱感作させてゴナドトロピン分泌を抑制する",E:"TSH受容体を刺激して甲状腺ホルモン産生を促進する"},answer:"B",explanation:"デスモプレシンはADH（抗利尿ホルモン、バソプレシン）の合成アナログ。V2受容体（Gs共役型、腎集合管基底側に発現）を選択的に刺激し、cAMP→PKA→アクアポリン2（AQP2）の細胞膜への挿入→水再吸収増加→抗利尿作用を示す。尿崩症・夜尿症に使用。"},
+  {id:50,difficulty:2,category:"その他（痛風）",question:"アロプリノールの作用機序はどれか。",choices:{A:"尿酸の腎排泄を促進する（尿酸排泄促進薬）",B:"キサンチンオキシダーゼを阻害してヒポキサンチン→キサンチン→尿酸への変換を阻害し尿酸産生を抑制する（尿酸産生抑制薬）",C:"腸管での尿酸吸収を阻害する",D:"尿酸結晶の溶解を促進する",E:"好中球の尿酸結晶への反応（NLRP3インフラマソーム）を抑制する"},answer:"B",explanation:"アロプリノールはキサンチンオキシダーゼの阻害薬。プリン体（ヒポキサンチン・キサンチン）から尿酸への変換を阻害して血清尿酸値を低下させる。腎機能低下者では用量調整が必要。代謝物オキシプリノールも活性を持つ。発作急性期には使用しない（発作を誘発・遷延させる可能性）。"},
+  {id:51,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中期以降、血漿量は非妊娠時と比較してどのように変化するか。また分布容積（Vd）への影響として正しいものはどれか。",choices:{A:"血漿量は約20%減少し、分布容積は低下する",B:"血漿量は約40〜50%増加し、水溶性薬物の分布容積が増大して血中濃度が低下しやすい",C:"血漿量は変化しないが、脂肪組織の増加により脂溶性薬物のVdが低下する",D:"血漿量は約10%増加するが、薬物動態への影響はほとんどない",E:"血漿量は増加するが赤血球量も同率で増加するため希釈効果は生じない"},answer:"B",explanation:"妊娠中期〜後期にかけて血漿量は40〜50%増加（赤血球量は20〜30%増加）し、希釈性貧血が生じる。水溶性薬物（アミノグリコシド系・βラクタム系など）の分布容積が増大し、同一投与量では血中濃度が低下しやすい。治療域が狭い薬物では増量が必要になることがある。"},
+  {id:52,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中は血清アルブミン濃度が低下する。高タンパク結合薬（例：フェニトイン・ワルファリン）の薬効への影響として正しいものはどれか。",choices:{A:"タンパク結合率が低下し、遊離型（活性型）薬物濃度が上昇して薬効・副作用が増強する可能性がある",B:"タンパク結合率が低下することで薬物の半減期が延長し、蓄積しやすくなる",C:"総薬物濃度が上昇するため薬効が増強する",D:"タンパク結合率の低下により腎排泄が低下し、薬物が蓄積する",E:"アルブミン低下は薬物動態に影響しない"},answer:"A",explanation:"妊娠中はアルブミン濃度が低下するため、高タンパク結合薬では遊離型（薬理活性型）の割合が増加する。総薬物濃度は低値に見えても遊離型濃度は正常範囲であることがある。フェニトインのTDMでは遊離型濃度の測定が推奨される。"},
+  {id:53,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中の糸球体濾過率（GFR）の変化と、用量調整が必要な薬剤の組み合わせとして最も適切なものはどれか。",choices:{A:"GFRは約30%低下するため、腎排泄型薬物は蓄積しやすく減量が必要",B:"GFRは約50%増加するため、腎排泄型薬物（リチウム・アミノグリコシド系等）は血中濃度が低下しやすく増量または頻回投与が必要になることがある",C:"GFRは変化しないため腎排泄型薬物の用量調整は不要",D:"GFRは変動するが腎排泄型薬物の用量には影響しない",E:"GFRは低下するため血清クレアチニン値が上昇する"},answer:"B",explanation:"妊娠中はGFRが約40〜60%増加し、腎血漿流量も増大する。腎排泄型薬物（リチウム・アミノグリコシド系・βラクタム系・ジゴキシン等）のクリアランスが上昇し血中濃度が低下しやすい。なお妊娠中の血清クレアチニンは正常値より低下するため「正常値」が偽高値に見えることに注意。"},
+  {id:54,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中のCYP（チトクロームP450）酵素活性の変化として正しいものはどれか。",choices:{A:"すべてのCYPが同様に増加する",B:"CYP3A4・CYP2D6は活性が増加し、CYP1A2・CYP2C19は活性が低下する",C:"CYP1A2が最も増加し、テオフィリンの代謝が亢進する",D:"CYP2C9のみ増加し、ワルファリンの必要量が増加する",E:"すべてのCYPが低下するため肝代謝型薬物は蓄積しやすい"},answer:"B",explanation:"妊娠中のCYP変化は酵素によって異なる。CYP3A4（ニフェジピン・タクロリムス等）・CYP2D6（メトプロロール等）・CYP2C9（フェニトイン等）は活性増加→血中濃度低下傾向。一方CYP1A2（テオフィリン・カフェイン等）・CYP2C19（PPI等）は活性低下→血中濃度上昇傾向。妊娠中はTDMが重要。"},
+  {id:55,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中の消化管変化が薬物吸収に与える影響として正しいものはどれか。",choices:{A:"妊娠中はプロゲステロンの影響で消化管運動が亢進し、薬物吸収が速まる",B:"妊娠中はプロゲステロンにより消化管運動が低下（胃排出遅延・腸管通過時間延長）し、薬物吸収速度が低下するがAUCへの影響は薬物により異なる",C:"妊娠中は胃酸分泌が増加し、酸不安定な薬物の吸収が低下する",D:"消化管の変化は吸収に影響せず、妊娠中の吸収は非妊娠時と同一",E:"消化管運動が亢進するためCmaxが上昇する"},answer:"B",explanation:"妊娠中はプロゲステロンの平滑筋弛緩作用により胃排出が遅延し、腸管通過時間が延長する。薬物吸収のTmaxが遅れることがあり、つわりによる嘔吐も経口薬吸収を妨げる。胃酸分泌は妊娠初期に低下し後期に回復する傾向がある。"},
+  {id:56,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中の皮膚血流変化が経皮吸収型製剤に与える影響として正しいものはどれか。",choices:{A:"妊娠中は皮膚血流が約30〜40%増加し、貼付剤・クリーム剤の全身曝露量が増加する可能性がある",B:"妊娠中は皮膚が厚くなり経皮吸収が低下する",C:"経皮吸収に影響する変化は妊娠中に生じない",D:"妊娠中の角質層の変化により水溶性薬物の吸収のみが増加する",E:"経皮吸収の変化は妊娠後期（28週以降）にのみ生じる"},answer:"A",explanation:"妊娠中はエストロゲンの影響による皮膚血流増加（最大40%増）があり、経皮吸収型製剤（局所ステロイド・ニトログリセリンパッチ等）の全身曝露が増大する可能性がある。局所塗布の副腎皮質ステロイドは広範囲・長期使用で胎児副腎抑制のリスクがある。"},
+  {id:57,difficulty:2,category:"胎盤通過性",question:"薬物の胎盤通過性を規定する因子として、最も通過しやすい薬物の特性はどれか。",choices:{A:"分子量が大きい（>1000Da）・水溶性・タンパク結合率が高い",B:"分子量が小さい（<500Da）・脂溶性が高い・タンパク結合率が低い・非イオン化型が多い",C:"分子量が小さい・水溶性・タンパク結合率が低い",D:"脂溶性が高い・タンパク結合率が高い・分子量が大きい",E:"イオン化型が多い・脂溶性が高い・分子量が中程度"},answer:"B",explanation:"胎盤通過は主に受動拡散による。①分子量が小さい（目安<500Da、>1000Daはほとんど通過しない）、②脂溶性が高い（lipophilic）、③タンパク結合率が低い（遊離型が多い）、④非イオン化型が多い、の薬物が通過しやすい。ヘパリン（高分子量）・インスリン（高分子量）は胎盤を通過しにくい。"},
+  {id:58,difficulty:2,category:"胎盤通過性",question:"ヘパリン（未分画）、低分子ヘパリン（ダルテパリン）、ワルファリンの胎盤通過性の比較として正しいものはどれか。",choices:{A:"3剤とも胎盤を通過するため妊婦には禁忌",B:"ヘパリン・低分子ヘパリンは分子量が大きく胎盤を通過しない。ワルファリンは分子量が小さく脂溶性が高いため胎盤を通過し、胎児に出血リスクや催奇形性をもたらす",C:"ワルファリンは胎盤を通過しないが、ヘパリンは通過する",D:"低分子ヘパリンのみ胎盤を通過し、未分画ヘパリンは通過しない",E:"3剤とも胎盤を通過せず妊婦に安全に使用できる"},answer:"B",explanation:"ヘパリン（分子量15,000〜18,000Da）および低分子ヘパリン（4,000〜8,000Da）は高分子量のため胎盤を通過しない。ワルファリン（分子量約308Da・脂溶性）は胎盤を容易に通過し、胎児の凝固因子合成阻害（ワルファリン胎芽病、特に妊娠6〜12週）・胎児出血リスクがある。妊娠中の抗凝固療法では原則ヘパリン系が使用される。"},
+  {id:59,difficulty:2,category:"胎盤通過性",question:"インスリンの胎盤通過性について正しいものはどれか。",choices:{A:"インスリンは脂溶性が高いため胎盤を容易に通過し、胎児低血糖を引き起こす",B:"インスリンは分子量が大きいタンパク質（約6000Da）であり胎盤をほとんど通過しないため、妊娠糖尿病の治療に安全に使用できる",C:"インスリンは活性輸送によって胎盤を通過する",D:"インスリンは妊娠中期以降に胎盤通過性が増大する",E:"インスリンは胎盤通過後、胎児肝臓で速やかに不活化されるため安全"},answer:"B",explanation:"インスリンは分子量約6,000Daのポリペプチドホルモンでありサイズが大きいため、胎盤をほとんど通過しない。このため妊娠糖尿病・糖尿病合併妊娠の治療薬として安全に使用できる。なお、母体高血糖→胎児高血糖→胎児膵β細胞からのインスリン分泌亢進という間接的な経路で胎児に影響を与えることには注意が必要。"},
+  {id:60,difficulty:2,category:"胎盤通過性",question:"ACE阻害薬（エナラプリル等）とARB（カンデサルタン等）が妊娠中期・後期に禁忌とされる主な理由はどれか。",choices:{A:"催奇形性が高く、すべての妊娠週数で禁忌",B:"胎盤を通過して胎児のレニン-アンジオテンシン系を抑制し、胎児・新生児の腎機能障害（尿細管形成不全・腎不全）・羊水過少症・頭蓋骨低形成・新生児死亡を引き起こす",C:"母体の血圧を下げすぎて胎盤血流を低下させることのみが問題",D:"母乳への移行量が多く授乳婦に禁忌だが妊娠中は使用可能",E:"薬物の胎盤通過性がないため問題は母体副作用のみ"},answer:"B",explanation:"ACE阻害薬・ARBは胎盤を通過し、胎児のRAS（レニン-アンジオテンシン系）を阻害する。胎児の腎臓はアンジオテンシンIIに依存して発達するため、妊娠中期（14週）以降の曝露で胎児腎機能障害・羊水過少・肺低形成・頭蓋骨形成不全などの重篤な胎児毒性を引き起こす。発覚次第すぐに中止が必要。"},
+  {id:61,difficulty:2,category:"胎盤通過性",question:"胎盤においてP糖タンパク（P-gp）が果たす役割として正しいものはどれか。",choices:{A:"P-gpは胎盤の母体側に発現し、薬物を母体血中に能動輸送して胎盤通過を促進する",B:"P-gp（ABCB1）は胎盤栄養膜細胞の母体側（刷子縁膜）に発現し、基質薬物を胎児側から母体側に汲み出す排出輸送体として機能し、胎児への薬物曝露を制限する",C:"P-gpは胎盤には発現せず血液脳関門のみに存在する",D:"P-gpは妊娠後期にのみ発現し妊娠初期の胎児は保護されない",E:"P-gpは胎盤でインスリンのみを輸送する特異的な輸送体である"},answer:"B",explanation:"P糖タンパク（P-gp、ABCB1）は胎盤栄養膜細胞の刷子縁膜（母体側）に発現し、基質薬物（ジゴキシン・タキサン系等）を胎児側→母体側に能動的に輸送して胎児への薬物曝露を制限する「胎盤バリア」として機能する。ただし非基質薬物はこの制限を受けない。"},
+  {id:62,difficulty:2,category:"胎盤通過性",question:"ドキシサイクリン（テトラサイクリン系）の妊婦・小児への影響として正しいものはどれか。",choices:{A:"胎盤を通過しないため妊婦に安全に使用できる",B:"Ca²⁺とキレートを形成して胎児・新生児の骨や歯牙に沈着し、骨発育障害・歯牙着色（黄褐色）を引き起こす。妊娠中・8歳未満には原則禁忌",C:"胎盤を通過するが乳汁中では不活化されるため授乳婦には安全",D:"歯牙着色は永久歯にのみ影響し乳歯には影響しない",E:"テトラサイクリン系は骨への沈着はなく腎毒性のため妊婦禁忌"},answer:"B",explanation:"テトラサイクリン系はCa²⁺とキレート複合体を形成し、活発に石灰化が進んでいる骨や歯牙組織に沈着する。胎盤を通過するため妊娠中期以降（骨・歯牙形成期）の使用で胎児の骨発育障害・乳歯変色（黄〜褐色）が生じる。授乳中も乳汁に移行するため哺乳乳幼児でも同様の問題が生じうる。妊婦・8歳未満に原則禁忌。"},
+  {id:63,difficulty:2,category:"母乳移行性",question:"薬物の母乳への移行量を規定する因子として正しいものはどれか。",choices:{A:"分子量が大きいほど母乳に移行しやすい",B:"脂溶性が高い・分子量が小さい・タンパク結合率が低い・非イオン化型が多いほど母乳に移行しやすい",C:"水溶性薬物は母乳（脂肪を含む）に特異的に高濃度で移行する",D:"タンパク結合率が高いほど母乳移行量が増加する",E:"経口バイオアベイラビリティが低い薬物ほど母乳に移行しやすい"},answer:"B",explanation:"母乳移行は主に受動拡散で、①脂溶性が高い（母乳は脂肪含量が高い）、②分子量が小さい（<200Daは容易に通過、>1000Daはほとんど通過しない）、③タンパク結合率が低い（遊離型のみ移行）、④非イオン化型が多い、薬物で移行量が多い。また乳汁のpH（約7.0）は血漿（7.4）より低いため弱塩基性薬物がイオントラッピングされる。"},
+  {id:64,difficulty:2,category:"母乳移行性",question:"授乳安全性の評価指標RID（相対乳児投与量）について正しいものはどれか。",choices:{A:"RIDは母親の1日投与量に対する乳児が母乳から摂取する1日推定量の割合で、一般的にRID<10%であれば授乳を継続できる可能性が高い",B:"RIDは乳汁中薬物濃度と血漿中薬物濃度の比（M/P比）と同じ意味である",C:"RIDが高いほど乳児への影響は少ない",D:"RIDは乳汁分泌量に関係なく計算できる",E:"RIDの基準値は5%未満であり、5〜10%では必ず授乳中止が必要"},answer:"A",explanation:"RID（Relative Infant Dose）＝（乳児が母乳経由で摂取する薬物量 mg/kg/日）÷（母親の投与量 mg/kg/日）×100(%)。一般にRID<10%なら授乳継続可能とされる（Hale基準）。RID<1%は非常に安全、10〜25%は要注意、>25%は授乳中止検討。M/P比はRID計算に用いるが別の指標。新生児・未熟児・腎機能未熟な乳児では個別評価が必要。"},
+  {id:65,difficulty:2,category:"母乳移行性",question:"母乳のpHは約7.0で血漿pH7.4より低い。弱塩基性薬物の乳汁移行への影響として正しいものはどれか。",choices:{A:"弱塩基性薬物は乳汁中でプロトン化（イオン化）されて細胞膜を通過できなくなり、乳汁中に蓄積する（イオントラッピング）",B:"弱塩基性薬物は乳汁のpHが低いため吸収されにくく、乳汁中濃度は低い",C:"弱酸性薬物が乳汁中に蓄積し、弱塩基性薬物は影響を受けない",D:"pHの差は小さいため薬物の乳汁移行に実質的な影響はない",E:"すべての薬物が均等にイオントラッピングされる"},answer:"A",explanation:"弱塩基性薬物は乳汁（pH≈7.0）でより高度にプロトン化（陽イオン型）し、膜を通過できないため乳汁中に閉じ込められる（イオントラッピング）。これによりM/P比>1となり乳汁中濃度が血漿より高くなりうる。逆に弱酸性薬物は血漿側によりイオン化されるため乳汁移行が少ない傾向がある。"},
+  {id:66,difficulty:2,category:"母乳移行性",question:"ワルファリンの授乳中の安全性について正しいものはどれか。",choices:{A:"ワルファリンは高タンパク結合率（約99%）のため乳汁への遊離型移行量が極めて少なくRIDが低い。授乳婦での使用が可能とされている",B:"ワルファリンはM/P比が高く乳児に出血リスクがあるため授乳禁忌",C:"ワルファリンは経口バイオアベイラビリティが低いため乳児には影響しない",D:"ワルファリンは分子量が大きく母乳に移行しない",E:"ワルファリンは授乳中は低分子ヘパリンへの変更が必須"},answer:"A",explanation:"ワルファリンはタンパク結合率が約99%と非常に高いため、乳汁中に移行する遊離型薬物は極めて少ない。RIDは約0.08%と非常に低く、授乳中の乳児のPT/INRへの影響はほとんど報告されていない。国立成育医療研究センターの授乳安全薬リストにも含まれており授乳継続可能とされている。"},
+  {id:67,difficulty:2,category:"母乳移行性",question:"ダルテパリン（低分子ヘパリン）の授乳中の安全性について正しいものはどれか。",choices:{A:"分子量が大きいため乳汁にほとんど移行せず、移行しても消化管でほぼ分解されるため乳児への影響はほとんどない",B:"低分子ヘパリンは血液凝固を阻害するため乳汁中濃度に関係なく授乳禁忌",C:"低分子ヘパリンは脂溶性が高く乳汁に高濃度で移行する",D:"低分子ヘパリンは腸管から吸収されるため乳児の出血リスクがある",E:"低分子ヘパリンはワルファリンと同様のRIDで評価すべきである"},answer:"A",explanation:"低分子ヘパリン（ダルテパリン等、分子量4,000〜8,000Da）は高分子量・親水性のため乳汁への移行量は極めて少ない。また万一乳汁中に移行しても消化管からほとんど吸収されない（経口F値<1%）ため、乳児への全身的な抗凝固作用は生じない。授乳中の使用が可能とされている。"},
+  {id:68,difficulty:2,category:"母乳移行性",question:"授乳中に使用を避けるべき薬剤とその理由の組み合わせとして正しいものはどれか。",choices:{A:"メトクロプラミド：乳汁分泌を抑制するため",B:"アミオダロン（ヨード含有）：高濃度のヨードが乳汁に移行し、乳児の甲状腺機能に影響する",C:"アセトアミノフェン：乳汁移行量が多く乳児に肝毒性をもたらす",D:"イブプロフェン：乳汁中濃度が高く乳児の腎機能を障害する",E:"ワルファリン：乳汁移行量が多く乳児に出血を引き起こす"},answer:"B",explanation:"アミオダロンはヨード含有量が多く（薬物重量の約37%がヨード）、乳汁移行量も多い。M/P比は約3〜6と高く、乳児が摂取すると過剰ヨードによる甲状腺機能低下（甲状腺腫）を引き起こすリスクがある。また半減期が極めて長い（約40〜55日）ことも問題。授乳中は原則禁忌。"},
+  {id:69,difficulty:2,category:"母乳移行性",question:"授乳中の母親が薬を服用する際、乳児への薬物曝露を最小化する実践的な方法として最も適切なものはどれか。",choices:{A:"授乳直前に薬を服用し、薬が乳汁に移行する前に授乳を終わらせる",B:"授乳直後に薬を服用し、次回授乳まで（一般的に3〜4時間）の間に薬物が代謝・排泄されるようにする",C:"薬の服用時刻に関わらず乳汁中濃度は変わらない",D:"乳汁中薬物濃度のピークは服用後24時間後のためタイミングは関係ない",E:"就寝前に服用すれば夜間の授乳での曝露を避けられる"},answer:"B",explanation:"多くの薬物では乳汁中濃度のピークは服用後1〜3時間（血漿濃度ピークに近い時間帯）に来る。そのため授乳直後に服用することで次回授乳（3〜4時間後）までに乳汁中濃度が低下する。ただしこの方法は半減期が短い薬物に有効であり、半減期が長い薬物（アミオダロン等）には効果がない。"},
+  {id:70,difficulty:2,category:"母乳移行性",question:"乳児が母乳中の薬物を摂取した場合の安全性評価において、経口バイオアベイラビリティ（F値）が果たす役割として正しいものはどれか。",choices:{A:"F値が高い薬物ほど乳汁中濃度が高くなる",B:"薬物のF値が低い場合、乳児の消化管からの吸収量も少なくなるため、M/P比が高くてもリスクが低くなりうる",C:"F値は乳汁移行性には関係なく母親の吸収率のみを示す指標",D:"F値が高い薬物は乳汁移行が少ない",E:"F値は薬物の授乳安全性評価に使用されない"},answer:"B",explanation:"RIDはあくまで乳汁中に移行した薬物量の推定であり、実際に乳児の体内に吸収される量にはF値が関係する。例えばバンコマイシンはRIDが比較的高いが経口F値がほぼ0%（腸管から吸収されない）のため、乳汁経由での全身影響はほぼない。F値も合わせて評価することでより正確な授乳安全性判断ができる。"},
+  {id:71,difficulty:2,category:"母乳移行性",question:"スルホンアミド系薬・ニトロフラントインを新生児期（生後1ヶ月未満）に間接的に使用を避ける理由として正しいものはどれか。",choices:{A:"新生児の未熟な肝臓でグルクロン酸抱合能が低く、遊離型ビリルビンがアルブミンから置換されて核黄疸（ビリルビン脳症）を引き起こすリスクがある",B:"新生児の腎機能が未熟なため排泄されず蓄積する",C:"新生児に免疫抑制をもたらす",D:"新生児のGABA受容体に結合して神経毒性を示す",E:"新生児では腸内細菌の発達を妨げる"},answer:"A",explanation:"新生児では肝臓のグルクロン酸転移酵素（UGT）活性が未熟であり、間接（遊離）ビリルビンの抱合・排泄能が低い。スルホンアミド系はアルブミン結合部位をビリルビンと競合して置換し、遊離ビリルビン血中濃度を上昇させて核黄疸リスクを高める。ニトロフラントインはG6PD欠損新生児で溶血性貧血を引き起こす。"},
+  {id:72,difficulty:2,category:"母乳移行性",question:"授乳中に推奨度が高いNSAIDsとして正しいものはどれか。理由も含めて適切なものを選べ。",choices:{A:"インドメタシン（RIDが低く最も安全）",B:"イブプロフェン（RID<1%・タンパク結合率約99%で乳汁移行が非常に少なく、授乳中のNSAIDsとして推奨される）",C:"ロキソプロフェン（活性代謝物の乳汁移行が確認されていないため最安全）",D:"セレコキシブ（COX-2選択性があるため乳汁移行がない）",E:"アスピリン（低用量なら安全）"},answer:"B",explanation:"イブプロフェンはRID<1%で、タンパク結合率が約99%と高いため乳汁への遊離型移行が非常に少ない。授乳中の第一選択鎮痛薬の一つとして推奨される。ナプロキセン（RID約3%）も許容範囲とされる。アスピリンは高用量でライ症候群リスク・乳児出血リスクがあり推奨されない。"},
+  {id:73,difficulty:2,category:"母乳移行性",question:"授乳婦への薬物投与において安全性を高めるための原則として誤っているものはどれか。",choices:{A:"RIDが低い薬物を選択する（同効薬の中でより乳汁移行が少ないものを選ぶ）",B:"必要最低限の期間・用量で使用する",C:"授乳直後に服用し次回授乳までに血中濃度を下げる",D:"添付文書に「授乳中は禁忌」と記載されている薬物はすべて実際に乳児に有害であることが臨床試験で証明されている",E:"新生児・低出生体重児・腎機能未熟な乳児では通常の乳児より慎重に評価する"},answer:"D",explanation:"添付文書の「授乳中投与しないこと」の記載は、必ずしも実際の臨床的有害性が証明されているわけではない。安全性データの欠如から製薬企業が法的保護のために記載していることが多く、欧米の専門データベース（LactMed・Hale's等）では使用可能と判断されている薬物も少なくない。授乳安全性評価には個別の薬物動態データ・RID・臨床報告を総合的に判断することが必要。"},
+  {id:74,difficulty:3,category:"妊娠中の薬物動態",question:"葉酸（フォリン酸）補充が妊娠前から妊娠初期に推奨される主な理由はどれか。",choices:{A:"妊娠中の鉄欠乏性貧血を予防するため",B:"神経管閉鎖障害（二分脊椎・無脳症等）のリスクを低減するため。葉酸はDNA合成・細胞増殖に必須であり、閉鎖時期（受精後3〜4週）以前からの補充が必要",C:"妊娠悪阻（つわり）を改善するため",D:"胎盤形成を促進して流産を予防するため",E:"胎児の骨格発育に必要なカルシウム代謝を補助するため"},answer:"B",explanation:"葉酸（ビタミンB9）は一炭素単位代謝を介してDNA・RNAの合成・修復・細胞分裂に必須。神経管は受精後約3〜4週（多くの女性が妊娠を認識する前）に閉鎖するため、妊娠を希望する段階から1日400μgの補充が推奨される（NTD発症リスクを約50〜70%低減）。バルプロ酸・メトトレキサート等は葉酸代謝阻害によりリスクを高めるため、高用量補充が必要。"},
+  {id:75,difficulty:3,category:"妊娠中の薬物動態",question:"妊娠中の1回換気量の変化が吸入薬に与える影響として正しいものはどれか。",choices:{A:"妊娠中は1回換気量が約40%増加し分時換気量が増大するため、吸入薬の肺到達量が増加する可能性がある",B:"妊娠中は横隔膜が下降するため肺容量が増大し、吸入薬が希釈されて効果が低下する",C:"妊娠中の呼吸機能変化は吸入薬の薬物動態に影響を与えない",D:"妊娠中は呼吸回数が減少するため吸入薬の効果が低下する",E:"妊娠中は気道抵抗が増大するため吸入薬の肺到達量が低下する"},answer:"A",explanation:"妊娠中はプロゲステロンによる呼吸中枢刺激と子宮増大による横隔膜挙上で、1回換気量が約40%増加し分時換気量が増大する（呼吸数は大きく変化しない）。機能的残気量（FRC）は低下する。この変化により吸入麻酔薬の誘導が速くなることが知られており、吸入薬全般で肺到達量の変化を考慮する必要がある。"}
+  ,
+  {id:76,difficulty:2,category:"周産期医療・生理学",question:"妊娠中にhCG（ヒト絨毛性ゴナドトロピン）が分泌されることの主な生理的意義はどれか。",choices:{A:"胎盤形成を直接促進し、胎盤血流を維持する",B:"黄体を維持してプロゲステロン分泌を継続させ、妊娠を維持する",C:"子宮内膜の脱落膜化を引き起こす",D:"分娩時に子宮収縮を誘発する",E:"乳腺の発育を促進して授乳に備える"},answer:"B",explanation:"hCGは受精卵（栄養膜細胞）から分泌され、黄体を維持してプロゲステロンの産生を継続させる。プロゲステロンは子宮内膜を分泌期に保ち、妊娠を維持するために不可欠。hCG値は妊娠8〜10週頃にピークを迎え、その後低下する。妊娠悪阻（つわり）の発症時期とhCGピークが一致することから関連が示唆されている。"},
+  {id:77,difficulty:2,category:"周産期医療・生理学",question:"妊娠中のプロゲステロンの作用として誤っているものはどれか。",choices:{A:"子宮筋の弛緩維持（早産防止）",B:"頸管粘液の粘稠度を高めて感染を防ぐ",C:"胃食道括約筋を弛緩させて胃食道逆流を促進する",D:"体温を上昇させる（高温相）",E:"子宮内膜の増殖期への移行を促進する"},answer:"E",explanation:"プロゲステロンは子宮内膜を分泌期（黄体期）に維持するホルモンであり、増殖期への移行を促進するのはエストロゲンの作用である。プロゲステロンの主な作用は子宮筋弛緩、頸管粘液粘稠化、基礎体温上昇、胃食道括約筋弛緩（副作用的作用）など。"},
+  {id:78,difficulty:2,category:"周産期医療・生理学",question:"妊娠中の循環血液量の変化として最も正しいものはどれか。",choices:{A:"循環血液量は妊娠中に変化しない",B:"循環血液量は約10〜15%増加し、出産後に戻る",C:"循環血液量は約40〜50%増加し、それに伴い血液希釈が生じる",D:"循環血液量は増加するが赤血球量は減少する",E:"循環血液量増加により血圧は著明に上昇する"},answer:"C",explanation:"妊娠中は循環血液量が妊娠前と比べて約40〜50%増加する。このうち血漿量の増加（約50%）が赤血球量の増加（約25〜30%）を上回るため、ヘマトクリット・ヘモグロビン値が相対的に低下する（生理的貧血）。また、循環血液量増加にもかかわらず末梢血管抵抗低下により血圧は通常低下傾向となる。"},
+  {id:79,difficulty:2,category:"周産期医療・生理学",question:"妊娠中の腎機能変化として正しいものはどれか。",choices:{A:"糸球体濾過量（GFR）は妊娠前の約40〜60%に低下する",B:"GFRは約40〜60%増加し、血清クレアチニン値は低下する",C:"腎血流量は変化しないがGFRのみ増加する",D:"GFR増加により薬物の腎排泄は全薬物で低下する",E:"妊娠後期に腎機能は正常範囲に戻る"},answer:"B",explanation:"妊娠中は腎血流量・GFRがともに約40〜60%増加する。その結果、血清クレアチニン・BUN・尿酸値は非妊娠時より低値となる（非妊娠時正常値でも妊娠中は相対的に高値と解釈する場合もある）。腎排泄型薬物（ゲンタマイシン、アンピシリン等）はクリアランスが増大し、投与量調整が必要になる場合がある。"},
+  {id:80,difficulty:2,category:"周産期医療・生理学",question:"妊娠中の消化管変化として正しいものはどれか。",choices:{A:"胃酸分泌が増加して消化性潰瘍リスクが上昇する",B:"胃排出時間が短縮するため薬物の吸収速度が上がる",C:"腸管運動が低下し便秘になりやすく、胃排出時間も延長する",D:"食道下部括約筋の締まりが増し、胃食道逆流は減少する",E:"小腸での薬物吸収は変化しない"},answer:"C",explanation:"妊娠中のプロゲステロンは平滑筋弛緩作用を持ち、腸管蠕動低下による便秘、食道下部括約筋弛緩による胃食道逆流（胸焼け）を引き起こす。また胃排出時間（gastric emptying time）が延長するため、経口薬のTmaxが遅延し吸収速度が低下する。ただし小腸での最終的な吸収量（バイオアベイラビリティ）は必ずしも変化しない。"},
+  {id:81,difficulty:2,category:"周産期医療・生理学",question:"妊娠週数の数え方として正しいものはどれか。",choices:{A:"受精日を0日として計算し、受精後40週で正期産とする",B:"最終月経開始日を0日として計算し、40週0日（280日）前後が正期産の目安",C:"着床日を基準とし、着床から38週で正期産とする",D:"超音波検査での胎児頭殿長（CRL）のみで算出する",E:"最終月経開始日の14日後（排卵日）から計算する"},answer:"B",explanation:"産科的妊娠週数は最終月経（LMP）の開始日を0日として計算する。満40週（280日目）前後が正期産（37週0日〜41週6日）の目安。超音波でのCRL測定は妊娠週数の確認・修正に使われるが、基本はLMPから計算する。排卵・受精は通常LMPから約14日後なので、実際の受精から分娩まではおよそ38週。"},
+  {id:82,difficulty:2,category:"周産期医療・生理学",question:"オキシトシンの産科的役割として正しい記述の組み合わせはどれか。①子宮平滑筋を収縮させ、分娩時の陣痛を誘発・促進する ②授乳時の射乳反射を引き起こす ③妊娠初期から持続的に分泌され黄体を維持する ④産後の子宮収縮（子宮退縮）を促進して出血を減少させる",choices:{A:"①②③",B:"①②④",C:"②③④",D:"①③④",E:"①②③④"},answer:"B",explanation:"オキシトシンは視床下部で産生され下垂体後葉から分泌される。主な産科的作用は①子宮収縮誘発・促進（陣痛誘発薬として使用）、②射乳反射（授乳刺激により分泌）、④産後の子宮退縮促進。③黄体維持はhCGの作用であり、オキシトシンの役割ではない。"},
+  {id:83,difficulty:2,category:"周産期医療・生理学",question:"産褥期（出産後）の生理的変化として正しいものはどれか。",choices:{A:"プロラクチンは産後に著明に低下し、授乳促進には関与しない",B:"子宮は産後4〜6週をかけて非妊娠時の大きさに戻る（子宮退縮）",C:"産後のエストロゲン・プロゲステロンは直ちに妊娠中と同レベルを維持する",D:"授乳しない場合は産後2〜3週で月経が再開する",E:"産後のGFR低下により腎排泄型薬物の投与量を増量する必要がある"},answer:"B",explanation:"子宮退縮（involution）は産後6週をかけて進行し、非妊娠時の大きさに戻る。産後はエストロゲン・プロゲステロンが急激に低下しプロラクチンが上昇して乳汁分泌が促進される。授乳しない場合でも月経再開は通常産後6〜8週以降。産後はGFRが妊娠前値に戻る。"},
+  {id:84,difficulty:2,category:"周産期医療・生理学",question:"妊娠中の血清アルブミン値の変化と薬物動態への影響として正しいものはどれか。",choices:{A:"妊娠中は血清アルブミンが増加するため、薬物の蛋白結合率が上昇する",B:"妊娠中は血清アルブミンが低下するため、高タンパク結合薬の遊離型（活性型）分率が増加しうる",C:"血清アルブミン変化は薬物動態に影響しない",D:"妊娠中はα1酸性糖タンパクが著明に増加する",E:"蛋白結合率変化は腎排泄型薬物にのみ影響する"},answer:"B",explanation:"妊娠中は循環血液量増大による希釈効果でアルブミン濃度が約15〜20%低下する。高タンパク結合薬（フェニトイン、バルプロ酸等）では遊離型分率が増加し、見かけ上の薬効・副作用リスクが変化しうる（ただしクリアランスも変化するため複雑）。α1酸性糖タンパクは妊娠中に低下傾向。"},
+  {id:85,difficulty:2,category:"周産期医療・生理学",question:"妊娠中のCYP酵素活性変化として最も正しいものはどれか。",choices:{A:"すべてのCYP酵素活性が妊娠中に均等に増加する",B:"CYP3A4は妊娠中に活性増加し、CYP1A2は活性低下する傾向がある",C:"妊娠中はすべてのCYP酵素活性が抑制される",D:"CYP2D6活性は妊娠中に変化しない",E:"CYP酵素活性変化は授乳期のみに起こる"},answer:"B",explanation:"妊娠中のホルモン環境変化により各CYP酵素の活性が異なる方向に変化する。CYP3A4（ニフェジピン・ミダゾラム等の代謝）は増加、CYP1A2（カフェイン・クロザピン等の代謝）は低下、CYP2D6（メトプロロール・コデイン等の代謝）は増加傾向。CYP2C19は低下傾向。このため薬物の投与量調整が必要となる場合がある。"}
+  ,
+  {id:86,difficulty:2,category:"胎児・新生児",question:"薬物催奇形性における「絶対過敏期（器官形成期）」とはどの時期か。",choices:{A:"受精後1〜2週（着床前期）",B:"受精後3〜8週（器官形成期）",C:"妊娠中期（13〜27週）",D:"妊娠後期（28週以降）",E:"分娩直前（39〜40週）"},answer:"B",explanation:"器官形成期（受精後3〜8週、最終月経換算で5〜10週頃）は各臓器の原基が形成される最も重要な時期であり、薬物・放射線等への感受性が最も高い「絶対過敏期」とも呼ばれる。着床前期（受精後1〜2週）は全か無かの法則が働き、損傷すれば流産、回復すれば正常発育となる。妊娠中期・後期の薬物曝露は機能障害や発育遅延を引き起こすことはあるが、形態奇形は生じにくい。"},
+  {id:87,difficulty:2,category:"胎児・新生児",question:"新生児の生理的黄疸のメカニズムとして正しいものはどれか。",choices:{A:"新生児は成人より多量のビリルビンを産生し、かつ肝臓のUDP-グルクロン酸転移酵素（UGT1A1）活性が低いため非抱合型ビリルビンが蓄積する",B:"新生児の赤血球寿命は成人より長いためビリルビン産生が増加する",C:"新生児の腎臓がビリルビンを排泄できないため高ビリルビン血症が生じる",D:"新生児は胆汁酸合成能が低いためビリルビンを腸管から排泄できない",E:"母乳中のビリルビンが吸収されて蓄積する"},answer:"A",explanation:"新生児黄疸の主なメカニズムは①胎児型ヘモグロビン（HbF）から成人型への切り替えに伴う赤血球の大量破壊によるビリルビン産生増加、②肝臓のUGT1A1活性が未発達で非抱合型ビリルビンのグルクロン酸抱合能が低いこと、③腸肝循環の亢進。フェノバルビタールはUGT1A1を誘導して黄疸改善に使用されることがある。"},
+  {id:88,difficulty:2,category:"胎児・新生児",question:"新生児（生後1ヶ月未満）の薬物代謝能の特徴として正しいものはどれか。",choices:{A:"新生児のCYP3A4活性は成人と同等であり薬物代謝は問題ない",B:"新生児はCYP酵素活性が全般的に未熟であり、多くの薬物のクリアランスが低下する",C:"新生児は腸管からの薬物吸収が成人より低いため薬効が弱い",D:"新生児の薬物代謝能は出生直後から成人と同等に機能する",E:"新生児ではフェーズII反応（抱合反応）のみが完成しており、フェーズI反応は未発達である"},answer:"B",explanation:"新生児期はCYP1A2・CYP2C9・CYP2D6・CYP3A4などの酸化代謝酵素、グルクロン酸抱合（UGT）・硫酸抱合など抱合反応酵素がいずれも未発達。特にUGT未発達によるクロラムフェニコール蓄積が「グレイベビー症候群」を引き起こした歴史がある。腎排泄も未熟（GFR低値）。これらにより薬物の半減期が著明に延長する。"},
+  {id:89,difficulty:2,category:"胎児・新生児",question:"胎児循環の特徴として正しいものはどれか。",choices:{A:"胎児肺は機能しており、肺循環を通じてガス交換が行われる",B:"胎児では卵円孔（foramen ovale）と動脈管（ductus arteriosus）が存在し、肺を迂回した循環が行われる",C:"胎児の酸素供給は胎盤ではなく羊水から直接行われる",D:"胎児循環では門脈血がすべて肝臓を通過してから下大静脈に入る",E:"出生後も卵円孔は永久に開存して正常に機能する"},answer:"B",explanation:"胎児期には卵円孔（右心房と左心房の間の開口）と動脈管（肺動脈と大動脈をつなぐ短絡路）が存在し、酸素化されていない胎児の肺を迂回した循環が行われる。また静脈管（ductus venosus）により臍静脈血が肝臓を迂回して直接下大静脈に流入する。出生後、肺呼吸開始とともに肺血流が増加し、卵円孔・動脈管・静脈管はそれぞれ閉鎖する。"},
+  {id:90,difficulty:2,category:"胎児・新生児",question:"新生児薬物離脱症候群（NAS: Neonatal Abstinence Syndrome）について正しいものはどれか。",choices:{A:"NASはアルコールにのみ起こり、麻薬・向精神薬では生じない",B:"妊娠中の母体のオピオイド・ベンゾジアゼピン・SSRIなどへの曝露により新生児に離脱症状が生じることがある",C:"NASの症状は出生直後から48時間以内に必ず消失する",D:"NASはすべての場合に薬物療法が必要である",E:"妊娠中の抗うつ薬（SSRI）使用でNASは生じない"},answer:"B",explanation:"NASはオピオイド（ヘロイン・メサドン・コデイン等）、ベンゾジアゼピン、バルビツレート、SSRIなど母体が使用した精神作用物質が胎盤を通過し、出生後に薬物供給が断たれることで新生児に離脱症状が現れる。主症状は高音の啼泣・振戦・過敏性・嘔吐・下痢・発汗など。SSRIによる新生児遷延性肺高血圧（PPHN）リスクも報告されている。"},
+  {id:91,difficulty:2,category:"胎児・新生児",question:"新生児の血液脳関門（BBB）の特徴として正しいものはどれか。",choices:{A:"新生児のBBBは成人より成熟しており、薬物が脳内に移行しにくい",B:"新生児はBBBが未発達で、成人より薬物や物質が脳内に移行しやすい",C:"新生児のBBBは生後1週以内に成人と同等の機能に達する",D:"BBBの成熟度は中枢神経系薬物の安全性評価に影響しない",E:"新生児ではビリルビンはBBBを通過しない"},answer:"B",explanation:"新生児はBBBが未成熟であり、成人では脳内に移行しにくい物質（ビリルビン・一部の薬物等）が脳内に移行しやすい。特に非抱合型ビリルビンが核黄疸（kernicterus）を引き起こすことがある。モルヒネ・ベンゾジアゼピンなど中枢神経系作用薬は新生児でより強い中枢抑制をもたらす可能性がある。"},
+  {id:92,difficulty:2,category:"胎児・新生児",question:"新生児に対してビタミンK2シロップ（またはビタミンK注射）が投与される理由として正しいものはどれか。",choices:{A:"新生児は腸内細菌によるビタミンK産生が十分でなく、凝固因子（II・VII・IX・X）が低値で出血リスクがあるため",B:"新生児の骨形成を促進するため",C:"新生児の免疫能を高めるため",D:"母乳中にビタミンKが過剰に含まれるため中和する必要があるため",E:"新生児黄疸の治療として投与する"},answer:"A",explanation:"新生児は①胎盤移行量が少ない②腸内細菌叢が未熟でビタミンK産生が低い③母乳中ビタミンK含量が少ない（人工乳には添加）などの理由でビタミンK欠乏に陥りやすく、ビタミンK依存性凝固因子（II・VII・IX・X）が低値となる。ビタミンK欠乏性出血症（頭蓋内出血等）予防のため、生後24時間以内・生後1週・生後1ヶ月にビタミンK2シロップを投与する（または出生時にK2注射）。"},
+  {id:93,difficulty:2,category:"胎児・新生児",question:"胎児の薬物タンパク結合の特徴として正しいものはどれか。",choices:{A:"胎児血中アルブミン濃度は成人と同等であり、タンパク結合率は変わらない",B:"胎児は血清アルブミン・α1酸性糖タンパク（AGP）が低値であり、薬物の遊離型分率が成人より高い傾向がある",C:"胎児血中の薬物は全て母体と同じタンパク結合率を示す",D:"胎児のタンパク結合能は妊娠早期には高く、後期に低下する",E:"タンパク結合率が高い薬物（＞90%）は胎盤を通過しない"},answer:"B",explanation:"胎児血中アルブミン濃度は妊娠後半に増加するが、初期〜中期は低値。α1酸性糖タンパク（AGP）も低値。そのため遊離型薬物分率が高く、薬物感受性が成人より高い可能性がある。タンパク結合率が高くても、分子量小・脂溶性高・非イオン化型の薬物は胎盤を通過する（例：ワルファリン、フェニトイン）。"}
+  ,
+  {id:94,difficulty:3,category:"合併疾患",question:"妊娠高血圧症候群（HDP）の治療として、妊娠中に第一選択薬として使用される降圧薬はどれか。",choices:{A:"ACE阻害薬（エナラプリル等）",B:"ARB（カンデサルタン等）",C:"メチルドパまたはニフェジピン（徐放性）",D:"スピロノラクトン",E:"利尿薬（フロセミド）"},answer:"C",explanation:"妊娠中の高血圧治療ではACE阻害薬・ARBは胎児腎発育障害・羊水過少・腎不全を引き起こすため禁忌。第一選択はメチルドパ（長年の安全データあり）またはニフェジピン徐放錠。ヒドララジン（静注）は重症HDP急性期に用いる。スピロノラクトンは抗アンドロゲン作用があるため禁忌。利尿薬は循環血液量をさらに減少させ胎盤血流を悪化させる可能性があり原則避ける。"},
+  {id:95,difficulty:3,category:"合併疾患",question:"妊娠合併てんかんの管理において、最も催奇形性リスクが高いとされる抗てんかん薬はどれか。",choices:{A:"ラモトリギン",B:"レベチラセタム",C:"バルプロ酸ナトリウム",D:"カルバマゼピン",E:"クロナゼパム"},answer:"C",explanation:"バルプロ酸は抗てんかん薬の中で最も催奇形リスクが高く、神経管閉鎖障害（二分脊椎：リスク1〜2%）、心疾患、顔面奇形、発達障害などを引き起こす。また葉酸拮抗作用があるため高用量葉酸補充が必要。可能な限り妊娠前に他剤への切り替えを検討する。ラモトリギン・レベチラセタムは比較的催奇形リスクが低いとされる。ただしラモトリギンは妊娠中クリアランスが著明に増大するため投与量調整が必要。"},
+  {id:96,difficulty:3,category:"合併疾患",question:"妊娠合併甲状腺機能亢進症（バセドウ病）の治療として正しいものはどれか。",choices:{A:"妊娠中は甲状腺機能亢進症の治療薬はすべて使用禁忌である",B:"プロピルチオウラシル（PTU）は妊娠初期に、メチマゾール（MMI）は妊娠中期以降に使用することが推奨される",C:"メチマゾールは妊娠全期間を通じて最も安全な第一選択薬である",D:"放射性ヨウ素（アイソトープ）治療は妊娠中でも安全に使用できる",E:"甲状腺機能亢進症は妊娠中に自然寛解するため治療不要なことが多い"},answer:"B",explanation:"メチマゾール（MMI）は妊娠初期に頭皮欠損（aplasia cutis）・MMI関連胎芽症（食道・気管閉鎖等）のリスクがあるため、妊娠初期はPTUを優先する。妊娠中期以降はPTUの肝毒性リスクからMMIへの切り替えを検討する。放射性ヨウ素は胎児甲状腺に移行するため妊娠中は絶対禁忌。妊娠後半は免疫寛容により病状が改善することもあるが、管理が必要。"},
+  {id:97,difficulty:3,category:"合併疾患",question:"妊娠中うつ病に対するSSRI使用について正しいものはどれか。",choices:{A:"すべてのSSRIは妊娠中に絶対禁忌であり使用してはならない",B:"SSRIは妊娠初期の使用により心臓中隔欠損リスクの上昇が報告されているが、治療を要するうつ病では母体リスク（未治療うつ病）との比較においてリスクベネフィットを評価して使用可能",C:"SSRIは胎盤を通過しないため胎児への影響は全くない",D:"妊娠判明後はすべての抗うつ薬を即時中止すべきである",E:"パロキセチンはすべてのSSRIの中で妊娠中最も安全性が高い"},answer:"B",explanation:"SSRI（特にパロキセチン）は妊娠初期の使用で心臓中隔欠損・持続性肺高血圧（PPHN）のリスク上昇が報告されている。ただし未治療の重症うつ病自体も母体・胎児に重大なリスク（自殺企図・早産・低出生体重等）をもたらすため、リスクベネフィット評価のうえで継続使用を選択する場合がある。パロキセチンは妊娠中に特に注意が必要な薬剤である。急な中止は離脱症状のリスクがあり、医師と相談が必要。"},
+  {id:98,difficulty:3,category:"合併疾患",question:"切迫早産に対する子宮収縮抑制薬（子宮弛緩薬）として最もよく使用されるのはどれか。",choices:{A:"オキシトシン",B:"ジノプロスト（PGF2α）",C:"塩酸リトドリン（β2刺激薬）",D:"インドメタシン",E:"ジゴキシン"},answer:"C",explanation:"切迫早産の第一選択薬はβ2アドレナリン受容体刺激薬の塩酸リトドリンで、子宮平滑筋を弛緩させて収縮を抑制する。副作用として頻脈・動悸・低カリウム血症がある。オキシトシン・ジノプロストはむしろ子宮収縮促進薬。インドメタシン（COX阻害薬）も子宮収縮抑制効果があるが動脈管早期閉鎖リスクから妊娠32週以降は原則使用しない。"},
+  {id:99,difficulty:3,category:"合併疾患",question:"妊娠糖尿病（GDM）または糖尿病合併妊娠の管理において正しいものはどれか。",choices:{A:"妊娠中はスルホニルウレア系薬（グリベンクラミド等）が第一選択である",B:"食事療法・運動療法で血糖管理が不十分な場合にはインスリン療法を行う",C:"メトホルミンは妊娠中に最も安全性が確認されており広く推奨される",D:"妊娠中は血糖値が多少高くても胎児への影響はない",E:"DPP-4阻害薬は妊娠中の安全性が十分確立している"},answer:"B",explanation:"妊娠中の血糖管理は食事療法・運動療法が基本。それで不十分な場合はインスリン療法（ヒトインスリン・インスリンアナログ）を行う。スルホニルウレア系薬は胎盤通過・新生児低血糖リスクから日本では原則禁忌。メトホルミンも胎盤通過するが一部の国で使用されており、安全性データは蓄積中。DPP-4阻害薬・GLP-1受容体作動薬は妊娠中の安全性未確立で使用しない。未治療の高血糖は胎児の過剰発育・巨大児・周産期合併症のリスクを高める。"},
+  {id:100,difficulty:3,category:"合併疾患",question:"妊娠中の喘息管理について正しいものはどれか。",choices:{A:"妊娠中はすべての喘息治療薬が禁忌のため吸入薬のみ使用可能",B:"妊娠中の喘息はコントロールが不良な場合、胎児低酸素症・早産・低出生体重のリスクがあるため、適切な薬物療法を継続することが重要",C:"吸入ステロイドは全身に作用するため妊娠中は使用禁忌である",D:"β2刺激薬（サルブタモール等）は妊娠中には効果がなく使用しない",E:"妊娠中の喘息悪化にはシステムステロイドのみが有効である"},answer:"B",explanation:"妊娠中の喘息コントロール不良は母体・胎児両方のリスクとなる。吸入ステロイド（ブデソニド等）は妊娠中も安全性が高く、コントロールに必要な場合は継続使用する（吸入は全身曝露が少ない）。短時間作用型β2刺激薬（SABA：サルブタモール）は発作時に使用可能。長時間作用型β2刺激薬（LABA）も吸入ステロイドとの併用で使用される。全身ステロイドは重症発作には使用可能だが長期使用は避ける。"},
+  {id:101,difficulty:3,category:"合併疾患",question:"妊娠中のリウマチ（関節リウマチ）の病態として特徴的なのはどれか。",choices:{A:"妊娠中は関節リウマチの活動性が一貫して増悪する",B:"妊娠中（特に中期以降）は免疫寛容が生じてリウマチ活動性が改善することが多く、産後に再燃する傾向がある",C:"妊娠中のリウマチに対してメトトレキサートは安全に使用できる",D:"TNF-α阻害薬はすべて妊娠初期に使用禁忌である",E:"妊娠中のリウマチは治療不要で自然に完全寛解する"},answer:"B",explanation:"関節リウマチは妊娠中（特に妊娠後半）に免疫寛容の誘導により約70〜80%の患者で活動性が改善するとされる。産後は免疫が再活性化して再燃することが多い。メトトレキサートは催奇形性・流産リスクがあり妊娠中は禁忌（妊娠3ヶ月以上前に中止）。TNF-α阻害薬（エタネルセプト・アダリムマブ等）は妊娠初期〜中期は比較的安全とされるが、妊娠後期は胎盤通過量が増加するため中止時期を検討する。"},
+  {id:102,difficulty:3,category:"合併疾患",question:"妊娠悪阻（hyperemesis gravidarum）の管理において正しいものはどれか。",choices:{A:"妊娠悪阻では嘔吐が続いても絶食は禁忌である",B:"ジクレクチン（ドキシラミン＋ビタミンB6）は妊娠悪阻の治療薬として使用される",C:"妊娠悪阻に制吐薬は効果がなく使用しない",D:"妊娠悪阻は妊娠20週以降に最も多く発症する",E:"妊娠悪阻でビタミンB1（チアミン）欠乏が生じることはない"},answer:"B",explanation:"ジクレクチン（ドキシラミン＋ピリドキシン配合薬）は妊娠悪阻の治療薬として妊娠中の安全性データが多く、第一選択に位置づけられる国が多い（日本ではジクレクチンを2023年承認）。重症例ではメトクロプラミド・オンダンセトロンなど制吐薬も使用される。妊娠悪阻は妊娠初期（5〜10週）に最多。重症の嘔吐が持続する場合は脱水・ウェルニッケ脳症（チアミン欠乏）に注意し、ビタミンB1補充を行う。"},
+  {id:103,difficulty:3,category:"合併疾患",question:"妊娠中の統合失調症治療について正しいものはどれか。",choices:{A:"すべての抗精神病薬は妊娠中に絶対禁忌である",B:"妊娠中に抗精神病薬を急に中止すると精神症状が再燃し、母体・胎児双方に深刻なリスクをもたらす可能性があるため、専門医と連携してリスクベネフィットを評価する",C:"妊娠中の統合失調症には非定型抗精神病薬は使用できない",D:"クロザピンは妊娠中に安全性が最も確立された薬剤である",E:"抗精神病薬はすべて胎盤を通過しないため胎児への影響はない"},answer:"B",explanation:"統合失調症の薬物療法を妊娠中に突然中止すると重篤な精神症状再燃・自傷他害リスクが生じる。治療継続が必要な場合は最低有効量で継続し、精神科専門医・産科との連携が必須。抗精神病薬（ハロペリドール・リスペリドン等）は催奇形リスクは低いが、新生児薬物離脱症状・錐体外路症状に注意。クロザピンは農粒球減少リスクから妊娠中使用は慎重。"},
+  ,
+  {id:104,difficulty:2,category:"先天奇形・先天異常",question:"先天奇形の一般集団における自然発生率として最も近い値はどれか。",choices:{A:"全出生の約0.1〜0.5%",B:"全出生の約2〜3%",C:"全出生の約10〜15%",D:"全出生の約30%",E:"全出生の約50%以上"},answer:"B",explanation:"先天奇形（major birth defect）の自然発生率は全出生の約2〜3%とされ、これは薬物曝露がなくても発生するバックグラウンドリスクである。このバックグラウンドリスクの存在が、薬物の催奇形性評価を複雑にしている。薬物曝露群での奇形発生率がバックグラウンドリスクを有意に上回るかどうかを評価することが重要。"},
+  {id:105,difficulty:2,category:"先天奇形・先天異常",question:"Wilson（ウィルソン）の催奇形性判定基準の要件として誤っているものはどれか。",choices:{A:"動物実験で再現性を持って奇形が誘発される",B:"曝露と奇形の間に明確な用量反応関係がある",C:"器官形成期に特定の感受性時期がある",D:"曝露が奇形の原因となる明確なメカニズムが解明されていること",E:"臨床観察および疫学研究によって奇形の発生率上昇が確認される"},answer:"D",explanation:"Wilsonの催奇形性6原理は、①感受性時期の存在、②種・系統差、③用量反応関係、④投与経路の関与、⑤胎児毒性スペクトル、⑥宿主因子の関与であり、メカニズムの完全解明は必須要件ではない。催奇形性が証明されるためには疫学データや動物実験での再現性が重視されるが、機序不明でも催奇形物質として認定される場合がある（例：サリドマイド）。"},
+  {id:106,difficulty:2,category:"先天奇形・先天異常",question:"サリドマイドが催奇形物質として歴史的に重要な理由として正しいものはどれか。",choices:{A:"被曝した全ての胎児に同一の奇形が生じた",B:"世界で初めて市販薬の催奇形性が公式に認められ、薬剤安全性監視（ファーマコビジランス）強化のきっかけとなった",C:"ラット動物実験でも同様の催奇形性が再現された",D:"サリドマイドは現在でも完全禁止となっており医薬品として使用されていない",E:"サリドマイド被害は日本のみで発生した"},answer:"B",explanation:"サリドマイドは1950年代後半に妊娠悪阻の治療薬として使用されたが、アザラシ肢症（海豹肢：四肢短縮）などの重篤な奇形を世界で約1万人の新生児にもたらした。この事件を機にFDA規制強化・各国での薬剤安全性監視制度の整備が進んだ。なお、サリドマイドはラット等では催奖形性が再現されにくい種差があり評価を困難にした。現在はサリドマイドは厳格な管理下でハンセン病・多発性骨髄腫の治療薬として使用されている（THALIDOMIDE CELGENE等）。"},
+  {id:107,difficulty:2,category:"先天奇形・先天異常",question:"バルプロ酸の催奇形性として特に重要なのはどれか。",choices:{A:"四肢短縮（アザラシ肢症）",B:"神経管閉鎖障害（二分脊椎・無脳症）および発達障害（IQ低下・自閉症スペクトラム）リスクの増加",C:"口唇口蓋裂のみのリスク増加",D:"心臓奇形のみのリスク増加",E:"外耳奇形（小耳症）のリスク増加"},answer:"B",explanation:"バルプロ酸の主な胎児リスクは①神経管閉鎖障害（二分脊椎リスク約1〜2%、通常の10倍以上）②顔面奇形・心臓奇形・四肢奇形を含むバルプロ酸症候群③発達障害（IQ低下・言語発達遅延・自閉スペクトラム症）。特に神経管閉鎖障害予防に高用量葉酸（5mg/日）補充が推奨される。EUでは生殖可能年齢の女性への処方に厳格な制限が設けられている。"},
+  {id:108,difficulty:2,category:"先天奇形・先天異常",question:"妊娠中のACE阻害薬使用で特に懸念される胎児への影響はどれか。",choices:{A:"神経管閉鎖障害",B:"妊娠中期〜後期の曝露による胎児腎機能障害・羊水過少・頭蓋骨低形成・肺低形成",C:"四肢短縮",D:"口唇口蓋裂",E:"心臓中隔欠損"},answer:"B",explanation:"ACE阻害薬・ARBは妊娠中期〜後期に使用すると、胎盤のRAS（レニン・アンジオテンシン系）阻害により胎児の腎血流が低下し、羊水過少（無尿）・胎児腎不全・頭蓋骨低形成・肺低形成（Potter連鎖）を引き起こす。妊娠初期の曝露については心臓奇形リスク上昇の報告もある。したがってACE阻害薬・ARBは妊娠中（特に中期・後期）は禁忌。"},
+  {id:109,difficulty:2,category:"先天奇形・先天異常",question:"妊娠中のワルファリン使用について正しいものはどれか。",choices:{A:"ワルファリンは分子量が大きいため胎盤をほとんど通過しない",B:"妊娠初期（6〜12週）のワルファリン曝露は胎児性ワルファリン症候群（鼻形成不全・骨端の石灰化等）のリスクがある",C:"ワルファリンは妊娠全期間を通じて安全に使用できる抗凝固薬である",D:"ワルファリンの催奇形性はビタミンK投与で完全に予防できる",E:"低分子ヘパリンもワルファリンと同等の催奇形性リスクがある"},answer:"B",explanation:"ワルファリンは低分子量（330Da）で脂溶性が高く胎盤を容易に通過する。妊娠6〜12週の曝露では胎児性ワルファリン症候群（鼻骨・点状軟骨石灰化・発育遅延）を引き起こす。妊娠後期の曝露では胎児・新生児出血のリスクがある。そのため分娩前後はヘパリンへの切り替えが推奨される。低分子ヘパリン（LMWH）は分子量が大きく胎盤を通過しないため妊娠中の抗凝固療法の標準的選択肢。"},
+  {id:110,difficulty:2,category:"先天奇形・先天異常",question:"メトトレキサート（MTX）の催奇形性について正しいものはどれか。",choices:{A:"メトトレキサートは葉酸の構造類似体であり、葉酸代謝を阻害して神経管閉鎖障害・頭蓋奇形・四肢奇形などを引き起こす",B:"メトトレキサートは分子量が大きいため胎盤を通過しない",C:"メトトレキサートの催奇形性は投与後1週間で消失するため、1週後に妊娠しても問題ない",D:"メトトレキサートの催奇形性は動物実験では確認されたが人での報告はない",E:"メトトレキサートは少量であれば妊娠初期に使用可能である"},answer:"A",explanation:"メトトレキサートはジヒドロ葉酸還元酵素阻害薬として葉酸代謝を強力に阻害し、催奇形性（MTX胎芽症：頭蓋・四肢・顔面奇形）を引き起こす。妊娠前少なくとも3ヶ月（一般的には3〜6ヶ月）前の中止が推奨される。投与終了後も組織に蓄積するため即時妊娠は危険。リウマチ・乾癬・異所性妊娠等で使用される場合は事前の妊娠の除外と避妊指導が必須。"}
+  ,
+  {id:111,difficulty:2,category:"先天奇形・先天異常",question:"先天奇形の発生要因として現在支持されている考え方として最も適切なものはどれか。",choices:{A:"先天奇形はすべて遺伝的要因によって決まる",B:"先天奇形はすべて薬物・化学物質などの環境要因によって引き起こされる",C:"先天奇形の多くは遺伝的素因と環境因子（薬物・感染・放射線等）の相互作用による多因子性であると考えられている",D:"先天奇形の原因は現代医学では完全に解明されている",E:"先天奇形のうち50%以上が薬物によって引き起こされる"},answer:"C",explanation:"先天奇形の発生要因の内訳は概ね、遺伝的要因（染色体異常含む）約25%、環境因子（薬物・感染・放射線等）約10%、多因子性（遺伝と環境の相互作用）約65%とされ（確定割合は報告により異なる）、原因不明のものも多い。薬物による奇形は全先天奇形の約1〜5%と推定される。バックグラウンドリスク（自然発生率2〜3%）の理解が、薬剤の催奇形性評価に不可欠。"}
+  ,
+  {id:112,difficulty:3,category:"臨床研究・非臨床試験",question:"妊婦を対象とした無作為化比較試験（RCT）が少ない主な理由として正しいものはどれか。",choices:{A:"妊婦は薬物への感受性が低いため試験の有益性がないから",B:"倫理的問題（胎児への潜在的リスク）・インフォームドコンセントの困難性・法規制・製薬企業のリスク回避等により、妊婦を含む臨床試験が極めて少ない",C:"妊婦は薬物吸収能が低く正確なデータが得られないから",D:"妊婦は試験参加を希望しないから",E:"妊婦でのRCTは国際的に法律で全面禁止されているから"},answer:"B",explanation:"妊婦は歴史的に臨床試験から除外されてきた「治療的孤児（therapeutic orphan）」とも呼ばれる集団。主な理由は①胎児への未知リスク（催奇形性等）に関する倫理的問題、②インフォームドコンセントの複雑性、③訴訟リスク回避、④試験デザインの困難性。そのため妊婦への薬物使用データの多くは症例報告・レジストリ・疫学研究等の観察データに依存している。"},
+  {id:113,difficulty:3,category:"臨床研究・非臨床試験",question:"妊婦への薬物安全性情報を収集する方法として「妊娠レジストリ（Pregnancy Registry）」の特徴はどれか。",choices:{A:"無作為割り付けを行うため交絡バイアスが完全に除去できる",B:"妊娠中に特定薬物を使用した女性を前向きに追跡し、妊娠転帰（奇形発生率等）を収集する前向きコホート型の安全性監視システム",C:"症例報告と同義であり、個々の症例のみを記録する",D:"動物実験に基づくデータを収集するシステムである",E:"薬物使用なしの対照群を持たないため転帰の評価はできない"},answer:"B",explanation:"妊娠レジストリは特定薬剤（抗てんかん薬・生物学的製剤等）の妊娠中使用者を前向きに登録し、奇形発生率・妊娠転帰を一般集団との比較で評価する観察研究。北米抗てんかん薬妊娠レジストリ（NAAED）等が有名。RCTのような無作為割り付けはないが、前向き設計により選択バイアスを軽減する。対照群（薬物未使用者）との比較が行われる。"},
+  {id:114,difficulty:3,category:"臨床研究・非臨床試験",question:"症例対照研究（case-control study）において妊婦への薬物催奇形性を評価する際の限界として正しいものはどれか。",choices:{A:"症例対照研究は大規模なサンプルが必要でコストが高すぎて実施不可能",B:"回想バイアス（recall bias）：奇形児を持つ母親は薬物曝露を詳細に記憶しやすい一方、正常児を持つ対照群は記憶が不正確なため、曝露率が過大評価されやすい",C:"症例対照研究では因果関係を直接証明できないが偽陰性が多い",D:"症例対照研究ではすべての交絡因子を完全に制御できる",E:"症例対照研究は前向き研究より信頼性が高い"},answer:"B",explanation:"症例対照研究での催奇形性評価では、回想バイアス（recall bias）が最大の問題。奇形を持つ児の母親は妊娠中の薬物・化学物質曝露を詳細に思い出そうとする傾向があり、対照群（正常児の母）は漫然とした記憶になるため、見かけ上の曝露率の差が生まれる。また既存の診断バイアス・選択バイアス・交絡因子の制御も困難。コホート研究より後向き設計であるため信頼性は劣る面がある。"},
+  {id:115,difficulty:3,category:"臨床研究・非臨床試験",question:"ICH S5（医薬品の生殖発生毒性試験ガイドライン）におけるStudy Stage（試験段階）の分類として正しいものはどれか。",choices:{A:"Segment I: 発がん性試験、Segment II: 反復毒性試験、Segment III: 単回毒性試験",B:"ICH S5では試験をStage A〜Fの6段階に分類し、受精から成熟まで評価する",C:"旧ICH S5A/SBではSegment I（受胎能・着床前後）・Segment II（器官形成期：胚胎児毒性）・Segment III（周産期・授乳期）の3段階で評価する",D:"生殖発生毒性試験はラットのみで実施すれば十分である",E:"Segment IIは親動物の雄のみを対象として評価する"},answer:"C",explanation:"旧ICH S5A/B（現在はICH S5 R3で統合）の生殖発生毒性試験は、Segment I（受胎能及び初期胚発生：雄雌生殖機能・着床・胚発生）、Segment II（胚胎児発生毒性試験：器官形成期の催奇形性評価）、Segment III（出生前後の発生及び母体機能：分娩・哺育・F1世代発育評価）の3段階。通常ラット＋ウサギ（または非ヒト霊長類）の2種で実施。"},
+  {id:116,difficulty:3,category:"臨床研究・非臨床試験",question:"薬物の催奇形性に関する動物実験結果をヒトに外挿する際の問題点として最も重要なのはどれか。",choices:{A:"動物実験は高コストであること",B:"動物種間での薬物代謝・胎盤構造・感受性時期の差異が大きく、動物実験結果がヒトに必ずしも当てはまらない（種差の問題）",C:"動物実験ではSegment IIのみが実施できず情報が不十分",D:"動物実験の結果は規制当局に認められていない",E:"動物実験ではランダム割り付けができない"},answer:"B",explanation:"種差は催奇形性評価の最大の課題の一つ。例えばサリドマイドはヒト・ウサギ・一部の霊長類では催奇形性を示すが、ラット・マウスでは現れにくい（用量・代謝が異なるため）。逆に動物で催奇形性を示した薬物がヒトでは問題ないケースもある。胎盤の構造（血絨毛性・血内皮性等）も種間で異なり、薬物移行性に影響する。"},
+  {id:117,difficulty:3,category:"臨床研究・非臨床試験",question:"妊婦・授乳婦への薬物安全性情報のデータベースとして最も広く利用されている文献・データベースはどれか。",choices:{A:"添付文書のみを参照すれば最新の安全性情報が得られる",B:"LactMed（米国NLM）・Hale's Medications and Mothers' Milk・REPROTOX・TERIS・Motherisk等の専門データベースが妊婦・授乳婦の薬剤評価に用いられる",C:"教科書（薬理学テキスト）の記載が最も信頼性が高い",D:"添付文書に「禁忌」と記載されているすべての薬物は実際に臨床データでの有害性が証明されている",E:"メーカー提供情報（市販後調査）のみで安全性評価が可能"},answer:"B",explanation:"妊婦・授乳婦への薬物安全性評価には複数の専門データベース・文献を総合的に参照する。LactMedは授乳中薬剤の授乳安全性情報（RID・M/P比等）をNLMが無料公開。Hale's Medications and Mothers' Milkは授乳安全性の標準的参考書（Lactation Risk Category L1〜L5）。REPROTOX・TERISは催奇形性・生殖毒性のデータベース。添付文書の禁忌記載は安全データ不足による予防的記載も多く、それのみを根拠とした判断は不十分。"}
+  ,
+  {id:118,difficulty:3,category:"臨床研究・非臨床試験",question:"コホート研究（前向き）と症例対照研究（後ろ向き）の特徴の比較として正しいものはどれか。",choices:{A:"コホート研究は曝露から開始し複数のアウトカムを評価できるが、長期追跡が必要で費用・時間がかかる",B:"症例対照研究はコホート研究より常に信頼性が高い",C:"コホート研究は希少疾患の研究に最も適している",D:"症例対照研究では相対リスク（RR）を直接計算できる",E:"両研究とも交絡因子の制御は不可能である"},answer:"A",explanation:"コホート研究は曝露群・非曝露群を前向きに追跡して複数アウトカム（奇形・早産・流産等）を同時に評価でき、相対リスクを直接算出できる。ただし長期追跡が必要でコスト大。症例対照研究は既存の奇形症例から後ろ向きに曝露を評価するため迅速・安価で希少疾患に向くが、回想バイアス等の問題があり、オッズ比（OR）を算出する（RRの近似値として使用）。"}
+  ,
+  {id:119,difficulty:1,category:"栄養・嗜好品",question:"妊娠を計画している女性、および妊娠初期の女性に推奨される葉酸補充量として正しいものはどれか。",choices:{A:"妊娠が確認されてから葉酸400μg/日を摂取開始すれば十分である",B:"妊娠の少なくとも1ヶ月前（理想的には3ヶ月前）から妊娠12週まで、食事に加えてサプリメントで葉酸400μg/日を補充する",C:"葉酸は食事からの摂取のみで十分であり、サプリメント補充は不要",D:"葉酸は妊娠後期（28週以降）からの補充が最も重要",E:"バルプロ酸を服用中の妊婦にも通常量（400μg/日）の葉酸で十分である"},answer:"B",explanation:"神経管閉鎖（閉鎖）は受精後約28日（多くの女性が妊娠に気づく前）に完了するため、妊娠前からの葉酸補充が必要。WHO・各国ガイドラインで妊娠計画段階（少なくとも1ヶ月前）から妊娠12週まで400μg/日の葉酸サプリメント補充を推奨（NTD発症リスクを50〜70%低減）。バルプロ酸・メトトレキサート等の葉酸拮抗薬を服用中の場合は高用量（4〜5mg/日）が推奨される。"},
+  {id:120,difficulty:1,category:"栄養・嗜好品",question:"妊娠中の鉄需要増大について正しいものはどれか。",choices:{A:"妊娠中の鉄必要量は非妊娠時と変わらない",B:"妊娠中は胎児・胎盤への鉄供給・循環血液量増大により鉄需要が増大し、特に妊娠中期〜後期に鉄欠乏性貧血が生じやすい",C:"妊娠中の鉄欠乏性貧血は胎児への影響がなく母体のみに影響する",D:"すべての妊婦に妊娠早期から高用量鉄剤の投与が必須である",E:"鉄剤の経口補充はすべての妊婦に副作用がないため積極的に行う"},answer:"B",explanation:"妊娠中は母体循環血液量増大・胎児・胎盤への鉄供給のため鉄需要が非妊娠時の約2〜3倍に増加。特に妊娠中期〜後期に鉄欠乏性貧血が生じやすい。母体の貧血は胎児低酸素・早産・低出生体重のリスクと関連。診断には血清フェリチン・ヘモグロビン・血清鉄等を用いる。鉄剤（硫酸第一鉄等）の経口投与が基本だが、便秘・悪心等の副作用があるため用量調整が必要な場合がある。"},
+  {id:121,difficulty:1,category:"栄養・嗜好品",question:"妊娠中のアルコール摂取がもたらす胎児影響として正しいものはどれか。",choices:{A:"妊娠中の少量アルコール摂取（週1〜2杯程度）は胎児への影響がないことが確立している",B:"アルコールは胎盤を通過して胎児血中濃度が母体と同程度になり、胎児性アルコールスペクトラム障害（FASD）の原因となる。安全な摂取量は存在しない",C:"アルコールの催奇形性は妊娠後期のみに生じる",D:"ビールの場合はワインより安全であり少量なら妊娠中でも問題ない",E:"アルコールは分子量が大きいため胎盤を通過しない"},answer:"B",explanation:"エタノールは低分子（MW=46）で脂溶性が高く胎盤を容易に通過し、胎児の血中濃度は母体と同等になる。胎児はアルコール代謝能が低い（ADH活性低）ため胎児体内に長時間残存する。FASDs（胎児性アルコールスペクトラム障害）は顔貌奇形・成長障害・神経発達障害（知的障害・学習困難）を含む。「安全なアルコール摂取量は存在しない」が世界的コンセンサスであり、妊娠中の飲酒は完全に避けることが推奨される。"},
+  {id:122,difficulty:1,category:"栄養・嗜好品",question:"妊娠中の喫煙（タバコ）が胎児・新生児に与える影響として正しいものはどれか。",choices:{A:"妊娠中の喫煙は胎児奇形（形態異常）の主要原因であるが早産は引き起こさない",B:"ニコチン・一酸化炭素による胎盤血流低下・胎児低酸素をもたらし、低出生体重・早産・周産期死亡・乳幼児突然死症候群（SIDS）のリスクが上昇する",C:"妊娠中の受動喫煙には胎児への影響はない",D:"妊娠後期にのみ喫煙の影響があり、妊娠初期の喫煙は問題ない",E:"電子タバコ（ENDS）は妊娠中に安全であることが証明されている"},answer:"B",explanation:"タバコのニコチンは血管収縮・胎盤血流低下を引き起こし、一酸化炭素は胎児ヘモグロビンのO2運搬能を低下させる。その結果、子宮内発育遅滞（IUGR）・低出生体重（LBW）・早産・胎盤早期剥離・SIDS リスク増加が生じる。禁煙サポートが妊娠中に最も重要な介入の一つ。受動喫煙も同様のリスクがある。電子タバコも妊娠中の安全性は確立されていない。"},
+  {id:123,difficulty:1,category:"栄養・嗜好品",question:"妊娠中のビタミンA（レチノール）過剰摂取のリスクとして正しいものはどれか。",choices:{A:"ビタミンAは水溶性ビタミンのため過剰摂取しても胎児に影響しない",B:"レチノール（動物性ビタミンA）の過剰摂取（10,000IU/日以上）は催奇形性（頭部・顔面・心臓奇形等）があるため、妊娠中は上限量以内の摂取に注意が必要",C:"β-カロテン（植物性ビタミンA前駆体）も大量摂取すると催奇形性がある",D:"ビタミンA過剰はすべての妊娠期間において催奇形性を示す",E:"妊娠中はビタミンAの補充は一切禁忌である"},answer:"B",explanation:"レチノール（プレフォームドビタミンA）は脂溶性で体内に蓄積し、過剰摂取（妊娠初期に10,000IU/日以上）で催奇形性（頭部・顔面・心臓・泌尿生殖器奇形）のリスクがある。一方βカロテン（植物性食品・サプリメント）は体内でビタミンAに変換される際に調節機能があり、過剰摂取による催奇形性リスクはないとされる。妊娠中のレチノール上限は通常5,000IU/日以下が推奨。"},
+  {id:124,difficulty:1,category:"栄養・嗜好品",question:"妊娠中のカフェイン摂取に関する推奨として正しいものはどれか。",choices:{A:"カフェインは分子量が大きく胎盤を通過しないため妊娠中に制限する必要はない",B:"WHO・各国ガイドラインはカフェインを1日200mg未満（コーヒー約2杯相当）に制限することを推奨している",C:"妊娠中のカフェイン摂取量と早産・流産のリスクには全く関連がない",D:"緑茶・紅茶はカフェインを含まないため無制限に摂取可能",E:"妊娠中は1日500mg以上のカフェイン摂取が胎児発育に必要とされる"},answer:"B",explanation:"カフェインは低分子（MW=194）で脂溶性があり胎盤を通過する。胎児はカフェイン代謝酵素（CYP1A2）がなく排泄できないため蓄積する。高用量カフェイン摂取は流産・低出生体重のリスク上昇と関連するとの報告があり、WHO・英国NHS等は妊娠中のカフェインを200mg/日未満に制限することを推奨。コーヒー（1杯=約100mg）2杯・紅茶（1杯=約75mg）・コーラ・チョコレートにもカフェインが含まれる。"},
+  {id:125,difficulty:1,category:"栄養・嗜好品",question:"妊娠中のDHA（ドコサヘキサエン酸）・EPA（エイコサペンタエン酸）摂取の重要性として正しいものはどれか。",choices:{A:"DHAは胎児の神経系・網膜の発育に重要で、妊娠中・授乳中は必要量が増加する",B:"DHAは妊娠中の摂取が禁忌とされている",C:"魚の摂取を控えることで水銀曝露とDHA不足を同時に解決できる",D:"DHAは植物性食品から十分摂取できるため魚の摂取は不要",E:"DHA・EPAの摂取は授乳期にのみ重要で妊娠中は不要"},answer:"A",explanation:"DHA（n-3系多価不飽和脂肪酸）は胎児の脳・神経系・網膜の発育に必須。妊娠中・授乳中は母体からの供給が重要で、需要が増加する。主な供給源は魚（青魚：サバ・イワシ・サーモン等）。一方、一部の大型魚（クロマグロ・キンメダイ等）にはメチル水銀が蓄積しやすく、過剰摂取は胎児神経発達に影響する可能性がある。厚生労働省・FDAは特定魚種の摂取頻度制限とDHAを多く含む低水銀魚の推奨バランスを提示している。"}
+  ,
+  {id:126,difficulty:2,category:"リスク評価・コミュニケーション",question:"米国FDAが2015年に旧来のABCDX妊婦薬物安全性カテゴリーを廃止し、PLLR（Pregnancy and Lactation Labeling Rule）に移行した主な理由はどれか。",choices:{A:"ABCDXカテゴリーは使いやすすぎて医療従事者が判断を怠るようになったため",B:"ABCDXカテゴリーは単純すぎて誤解を招きやすく、個々の薬物の実際のリスク情報を正確に伝えられないため、より詳細な文章形式の情報提供に変更された",C:"ABCDX分類はコストが高いため",D:"PLLRは添付文書の量を減らすための措置である",E:"ABCDXカテゴリーは授乳安全性情報を含まなかった唯一の問題点である"},answer:"B",explanation:"旧ABCDX分類（A=安全、B=動物試験で問題なし、C=動物試験で問題あり・人データなし、D=人での有害性証拠あり、X=禁忌）は、同じカテゴリー内でも薬物によってリスクの性質・程度が大きく異なるにもかかわらず単純分類に陥りやすく医療従事者の誤解を招くと批判された。PLLRではリスク要約・臨床考察・データを文章形式で提供し、妊娠・授乳・生殖への影響を個別かつ詳細に記載することとなった。"},
+  {id:127,difficulty:2,category:"リスク評価・コミュニケーション",question:"妊婦・授乳婦への薬剤使用におけるリスクベネフィット評価の基本原則として正しいものはどれか。",choices:{A:"妊婦には理由を問わず全ての薬物使用を禁忌とすべきである",B:"未治療の疾患が母体・胎児にもたらすリスクと薬物治療の潜在的リスクを比較し、総合的に判断する。治療利益が薬物リスクを上回る場合に使用を検討する",C:"リスクベネフィット評価は母体リスクのみを考慮すれば十分である",D:"動物試験で催奇形性が示された薬物はヒトでも必ず禁忌とすべきである",E:"添付文書に承認外と記載された用途での使用は妊婦において常に禁忌である"},answer:"B",explanation:"妊婦への薬剤使用の意思決定において、薬物投与のリスク（催奇形性・胎児毒性等）のみでなく、未治療のリスク（疾患進行・母体合併症・胎児への間接的影響）も考慮した総合的なリスクベネフィット評価が必要。例えば妊娠中のてんかん未治療による発作・抗凝固療法なしの血栓症・統合失調症の再燃等は重大な母体・胎児リスクとなる。「妊婦だから全て禁忌」という過剰な制限は時として有害となる。"},
+  {id:128,difficulty:2,category:"リスク評価・コミュニケーション",question:"妊婦への薬剤情報提供（リスクコミュニケーション）において有効な手法として正しいものはどれか。",choices:{A:"リスクは「高い・低い」などの定性的表現のみで伝えると理解しやすい",B:"絶対リスク（例：曝露群での奇形発生率）を一般集団のバックグラウンドリスクと比較して数値で提示することで、患者が正確にリスクを理解しやすくなる",C:"リスクコミュニケーションでは医療従事者が一方的に決定し、患者の意向は考慮しない",D:"不安を与えないために潜在的リスクは患者に伝えるべきではない",E:"すべての薬物は「危険かもしれない」と伝えれば十分なリスクコミュニケーションになる"},answer:"B",explanation:"リスクコミュニケーションの原則は①正確な情報提供（数値で伝える）②バックグラウンドリスクとの比較③患者の価値観・意向を尊重した共同意思決定（SDM: Shared Decision Making）④不確実性の正直な開示。例：「バルプロ酸服用中の神経管閉鎖障害リスクは約1〜2%で、通常のバックグラウンドリスク（0.1%）の10〜20倍」のように具体的数値で伝えることが推奨される。過度な不安惹起も問題だが、情報隠蔽は患者の自律性を損なう。"},
+  {id:129,difficulty:2,category:"リスク評価・コミュニケーション",question:"授乳安全性評価における相対的乳児用量（RID: Relative Infant Dose）の解釈として正しいものはどれか。",choices:{A:"RIDが高いほど授乳は安全と判断される",B:"RIDは乳児が母乳を通じて摂取する薬物量を母体の体重補正投与量に対する割合（%）で表し、一般的にRID<10%であれば授乳継続について比較的安全と評価される",C:"RIDが10%を超えた場合は必ず授乳を中止しなければならない",D:"RIDは薬物の乳汁/血漿濃度比（M/P比）と同義である",E:"RIDは薬物の胎盤通過性を示す指標である"},answer:"B",explanation:"RID（Relative Infant Dose）は[(乳汁薬物濃度(mg/L)×乳汁摂取量(L/kg/日)) / 母体投与量(mg/kg/日)] × 100(%)で計算される。乳児が母乳を通じて受ける薬物量が母体投与量の何%かを示す。Hale基準ではRID<10%を比較的安全の目安とする（ただし薬物の毒性・乳児の状態等も考慮が必要）。M/P比（乳汁/血漿濃度比）はRID計算の構成要素だが別の指標。"},
+  {id:130,difficulty:2,category:"リスク評価・コミュニケーション",question:"薬剤師が妊婦・授乳婦からの薬物相談に対応する際の基本的な姿勢として適切でないのはどれか。",choices:{A:"添付文書・専門データベース（LactMed・Hale's等）を参照し、最新のエビデンスに基づいた情報を提供する",B:"患者の不安に寄り添い、必要に応じて産婦人科・専門テラトロジーセンターへの紹介を行う",C:"「妊婦には全ての薬が危険」という決めつけを避け、個々のリスクベネフィットを評価して情報提供する",D:"医師が処方した薬物は全て安全であるため、患者の不安は全て根拠のないものとして否定する",E:"母体の疾患を未治療放置した場合のリスクも含めて、総合的な情報提供を行う"},answer:"D",explanation:"医師処方であっても妊婦・授乳婦への薬物使用には常に個別のリスクベネフィット評価が必要であり、患者の不安を全否定することは適切でない。薬剤師の役割は最新のエビデンスに基づく情報提供・患者支援・他職種との連携。不明点は「わからない」と正直に伝え、専門施設（虎の門病院・成育医療研究センター等のテラトロジー相談センター）への紹介も重要な対応の一つ。"}
+];
+
+// ===== 薬物動態カテゴリ定義 =====
+const PK_CATEGORIES = ["妊娠中の薬物動態", "胎盤通過性", "母乳移行性"];
+
+// ===== 新カテゴリグループ =====
+const SECTION_CATEGORIES = {
+  clinical:     ["臨床・実務（基礎）", "臨床・実務（応用）", "臨床・実務（実践）"],
+  perinatal:    ["周産期医療・生理学"],
+  fetal:        ["胎児・新生児"],
+  complication: ["合併疾患"],
+  congenital:   ["先天奇形・先天異常"],
+  research:     ["臨床研究・非臨床試験"],
+  nutrition:    ["栄養・嗜好品"],
+  risk:         ["リスク評価・コミュニケーション"]
+};
+
+// ===== State =====
+let currentList = [];
+let currentIndex = 0;
+let score = 0;
+let userAnswers = [];
+let answered = false;
+
+// ===== カテゴリリスト構築 =====
+function buildCatList() {
+  const counts = {};
+  quizData.forEach(q => { counts[q.category] = (counts[q.category] || 0) + 1; });
+  const cats = Object.keys(counts).sort();
+  const container = document.getElementById('catList');
+  cats.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'cat-item';
+    div.innerHTML = `<span>${cat}</span><span class="cat-count">${counts[cat]}問</span>`;
+    div.onclick = () => startQuiz(cat, true);
+    container.appendChild(div);
+  });
+}
+
+function toggleCatList() {
+  const list = document.getElementById('catList');
+  const arrow = document.getElementById('catArrow');
+  const isOpen = list.classList.toggle('open');
+  arrow.textContent = isOpen ? '∨' : '›';
+}
+
+// ===== サブボタン展開 =====
+function toggleSub(subId, btn) {
+  const sub = document.getElementById(subId);
+  const isOpen = sub.classList.toggle('open');
+  // 矢印を回転
+  const arrowMap = {
+    subPharma: 'arrowPharma', subPK: 'arrowPK', subAll: 'arrowAll',
+    subPerinatal: 'arrowPerinatal', subFetal: 'arrowFetal',
+    subComplication: 'arrowComplication', subCongenital: 'arrowCongenital',
+    subResearch: 'arrowResearch', subNutrition: 'arrowNutrition', subRisk: 'arrowRisk',
+    subDiffEasy: 'arrowDiffEasy', subDiffMid: 'arrowDiffMid', subDiffHard: 'arrowDiffHard',
+    subClinical: 'arrowClinical'
+  };
+  const arrow = document.getElementById(arrowMap[subId]);
+  if (arrow) arrow.textContent = isOpen ? '∨' : '›';
+  btn.classList.toggle('open', isOpen);
+  // 他のサブボタンを閉じる
+  ['subPharma', 'subPK', 'subAll', 'subPerinatal', 'subFetal', 'subComplication', 'subCongenital', 'subResearch', 'subNutrition', 'subRisk', 'subDiffEasy', 'subDiffMid', 'subDiffHard', 'subClinical'].forEach(id => {
+    if (id !== subId) {
+      document.getElementById(id).classList.remove('open');
+      const a = document.getElementById(arrowMap[id]);
+      if (a) a.textContent = '›';
+      const btnIdMap = {
+        subPharma: 'btnPharma', subPK: 'btnPK', subAll: 'btnAll',
+        subPerinatal: 'btnPerinatal', subFetal: 'btnFetal',
+        subComplication: 'btnComplication', subCongenital: 'btnCongenital',
+        subResearch: 'btnResearch', subNutrition: 'btnNutrition', subRisk: 'btnRisk',
+        subDiffEasy: 'btnDiffEasy', subDiffMid: 'btnDiffMid', subDiffHard: 'btnDiffHard',
+        subClinical: 'btnClinical'
+      };
+      const b = document.getElementById(btnIdMap[id]);
+      if (b) b.classList.remove('open');
+    }
+  });
+}
+
+// ===== 難易度別クイズ開始 =====
+function startQuizByDifficulty(diff, shuffle) {
+  currentList = quizData.filter(q => q.difficulty === diff);
+  if (shuffle) currentList.sort(() => Math.random() - 0.5);
+  currentIndex = 0; score = 0; userAnswers = [];
+  showScreen('screenQuiz');
+  renderQuestion();
+}
+
+// ===== クイズ開始 =====
+function startQuiz(mode, shuffle) {
+  if (mode === 'all') {
+    currentList = [...quizData];
+  } else if (mode === 'pharma') {
+    currentList = quizData.filter(q => !PK_CATEGORIES.includes(q.category));
+  } else if (mode === 'pk') {
+    currentList = quizData.filter(q => PK_CATEGORIES.includes(q.category));
+  } else if (SECTION_CATEGORIES[mode]) {
+    currentList = quizData.filter(q => SECTION_CATEGORIES[mode].includes(q.category));
+  } else {
+    currentList = quizData.filter(q => q.category === mode);
+  }
+  if (shuffle) {
+    currentList.sort(() => Math.random() - 0.5);
+  }
+  currentIndex = 0;
+  score = 0;
+  userAnswers = [];
+  showScreen('screenQuiz');
+  renderQuestion();
+}
+
+// ===== 問題描画 =====
+function renderQuestion() {
+  answered = false;
+  const q = currentList[currentIndex];
+  const total = currentList.length;
+  const pct = Math.round(((currentIndex) / total) * 100);
+
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${currentIndex + 1} / ${total}`;
+  document.getElementById('scoreText').textContent = `正解: ${score}`;
+  document.getElementById('quizHeaderSub').textContent = `問${currentIndex + 1} / ${total}`;
+  const diffLabel = {1:'★ 基礎', 2:'★★ 応用', 3:'★★★ 実践'};
+  const diffClass = {1:'d1', 2:'d2', 3:'d3'};
+  const catBadge = document.getElementById('categoryBadge');
+  catBadge.innerHTML = q.category + (q.difficulty ? ' <span class="diff-badge ' + (diffClass[q.difficulty]||'d2') + '">' + (diffLabel[q.difficulty]||'') + '</span>' : '');
+  document.getElementById('questionText').textContent = `Q${currentIndex + 1}. ${q.question}`;
+
+  const choicesWrap = document.getElementById('choicesWrap');
+  choicesWrap.innerHTML = '';
+  ['A','B','C','D','E'].forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-label">${key}</span><span>${q.choices[key]}</span>`;
+    btn.onclick = () => selectAnswer(key, btn);
+    choicesWrap.appendChild(btn);
+  });
+
+  document.getElementById('feedbackBanner').className = 'feedback-banner';
+  document.getElementById('feedbackBanner').innerHTML = '';
+  document.getElementById('explanationCard').className = 'explanation-card';
+  document.getElementById('nextBtn').className = 'next-btn';
+}
+
+// ===== 解答処理 =====
+function selectAnswer(selected, clickedBtn) {
+  if (answered) return;
+  answered = true;
+  const q = currentList[currentIndex  ,
+  {id:131,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠10週の28歳女性が頭痛を訴えて薬局を訪れた。OTC薬の選択について薬剤師として最も適切な対応はどれか。",choices:{A:"イブプロフェン含有の解熱鎮痛薬を第一選択として勧める",B:"アセトアミノフェン（カロナール等）を含む製品を選択し、必要最低限の量・期間で使用するよう説明する",C:"妊娠中の市販薬はすべて禁忌のため、何も勧めずに帰宅させる",D:"アスピリン含有の解熱鎮痛薬を勧める",E:"ロキソプロフェン含有の製品を推奨する"},answer:"B",explanation:"妊娠中の頭痛にはアセトアミノフェンが最も安全性の高い選択肢として国際的に推奨される。NSAIDs（イブプロフェン・ロキソプロフェン・アスピリン等）は妊娠後期（特に28週以降）に動脈管早期閉鎖・羊水過少のリスクがあり、妊娠初期でも安全データが十分でないため避けることが望ましい。アセトアミノフェンは通常用量・短期使用であれば妊娠全期間を通じて比較的安全。"},
+  {id:132,difficulty:1,category:"臨床・実務（基礎）",question:"産後3ヶ月で完全母乳栄養中の30歳女性。花粉症の症状（鼻炎・目のかゆみ）があり、抗アレルギー薬の相談に来た。授乳中に比較的安全とされる選択肢はどれか。",choices:{A:"第一世代抗ヒスタミン薬（ジフェンヒドラミン等）を第一選択とする",B:"ロラタジン（クラリチン）やセチリジン（ジルテック）等の第二世代抗ヒスタミン薬は乳汁移行量が少なく、授乳中に比較的使用しやすい",C:"抗アレルギー薬は授乳中にすべて禁忌である",D:"ケトチフェンは授乳中の第一選択として最も安全とされる",E:"抗アレルギー薬の種類に関わらず授乳直前に服用すれば安全である"},answer:"B",explanation:"ロラタジン・セチリジン・フェキソフェナジン等の第二世代（非鎮静性）抗ヒスタミン薬は分子量が比較的大きく、乳汁移行量（RID）が低く（ロラタジンRID≒1%）、授乳中に広く使用されている。第一世代（ジフェンヒドラミン等）は乳汁移行量が多く乳児への鎮静効果・乳汁分泌抑制のリスクがあるため、授乳中は第二世代が好ましい。"},
+  {id:133,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠8週の25歳女性が尿路感染症（膀胱炎）と診断された。使用可能な抗菌薬として最も適切なものはどれか。",choices:{A:"フルオロキノロン系（シプロフロキサシン）",B:"テトラサイクリン系（ドキシサイクリン）",C:"アモキシシリン（ペニシリン系）またはセファレキシン（第一世代セフェム系）",D:"ST合剤（スルファメトキサゾール・トリメトプリム）",E:"クロラムフェニコール"},answer:"C",explanation:"妊娠中の尿路感染症にはペニシリン系（アモキシシリン等）・セフェム系が比較的安全で第一選択。フルオロキノロン系は動物実験で関節軟骨への影響が懸念され妊娠中は避ける。テトラサイクリン系は骨・歯への沈着（歯の黄染等）のため妊娠4ヶ月以降禁忌。ST合剤は妊娠初期（葉酸拮抗）・後期（新生児核黄疸）での使用を避ける。クロラムフェニコールはグレイベビー症候群リスクから避ける。"},
+  {id:134,difficulty:1,category:"臨床・実務（基礎）",question:"授乳中の32歳女性が「子供が生後2ヶ月で完全母乳中ですが、歯科で抗生剤（アモキシシリン）が処方されました。授乳を続けても大丈夫ですか？」と相談してきた。最も適切な回答はどれか。",choices:{A:"アモキシシリンは授乳禁忌のため直ちに授乳を中止すべき",B:"アモキシシリンは乳汁移行量が少なく（RID約1%）、乳児への影響は通常軽微。授乳継続可能だが、乳児の軟便・下痢等の腸内細菌叢への影響に注意する",C:"授乳中の抗生剤使用では必ず人工乳に切り替える",D:"アモキシシリンは乳汁中に高濃度で移行するため授乳中止が必要",E:"薬剤師には判断する権限がなく、何も伝えてはいけない"},answer:"B",explanation:"アモキシシリンのRIDは約1%（通常<10%が許容範囲の目安）で、乳汁移行量は少ない。一般的に授乳継続が可能。ただし乳児の腸内細菌叢への影響から軟便・下痢が生じる可能性があり、観察を促す。LactMedでも授乳中の使用は通常問題ないと評価されている。薬剤師はエビデンスに基づいた適切な情報提供を行う義務がある。"},
+  {id:135,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠16週の31歳女性が「胃もたれ・胸焼けがひどい」と相談。OTCで購入できる制酸薬の選択について適切な情報はどれか。",choices:{A:"重曹（炭酸水素ナトリウム）は長期使用には向かないが短期の制酸には使用できる",B:"炭酸カルシウム系制酸薬・アルギン酸塩配合薬は妊娠中の胃食道逆流症状に比較的安全に使用できる",C:"H2受容体拮抗薬（ファモチジン等）は妊娠中に絶対禁忌である",D:"PPIは妊娠中に安全が最も確立されており、自己判断でも継続できる",E:"妊娠中の胃食道逆流は薬で治療してはいけない"},answer:"B",explanation:"妊娠中の胃食道逆流（GERD）はプロゲステロンによる食道下部括約筋弛緩と子宮増大が原因。炭酸カルシウム系制酸薬（カルシウム補充にもなる）・アルギン酸塩は妊娠中の安全性が高い。食事管理（少量頻回・就寝前食事回避）が基本。H2受容体拮抗薬（ファモチジン等）も妊娠中に使用されることがある（FDA旧分類B）。PPIは必要な場合に使用されるが、長期安全性データは蓄積中。"},
+  {id:136,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠14週の女性が便秘の相談。適切な対応として正しいものはどれか。",choices:{A:"センノシド（刺激性下剤）を大量に使用して即効性を得る",B:"まず食物繊維増加・水分摂取・適度な運動などの生活改善を指導し、薬剤が必要な場合は安全性の高い浸透圧性下剤（酸化マグネシウム等）を選択する",C:"ピコスルファートは妊娠中に最も安全な下剤として第一選択",D:"妊娠中の便秘は薬では治療できない",E:"腸管運動を促進する薬（メトクロプラミド等）を積極的に使用する"},answer:"B",explanation:"妊娠中の便秘はプロゲステロンによる腸管運動低下・鉄剤服用・水分摂取不足等が原因。まず非薬物療法（食物繊維・水分・運動）が基本。薬物療法ではバルクフォーミング薬（コンニャク芋・サイリウム等）・浸透圧性下剤（酸化マグネシウム）が比較的安全。刺激性下剤（センノシド・ピコスルファート等）は妊娠末期に子宮収縮を引き起こす可能性があり長期大量使用は避ける。"},
+  {id:137,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠前から高血圧で降圧薬を服用中の35歳女性が妊娠4週と判明した。現在服用しているのはカンデサルタン（ARB）である。薬剤師として最も重要な対応はどれか。",choices:{A:"ARBは胎児に影響しないため継続してよいと伝える",B:"ARBは妊娠中（特に中期・後期）に胎児腎障害等の深刻なリスクがあるため、至急産科医・内科医と連携してメチルドパやニフェジピン等への変更を検討するよう促す",C:"妊娠初期の4週であれば心配なく、12週まで継続してよい",D:"降圧薬は妊娠中に必要ないため自己判断で中止するよう伝える",E:"ARBを妊娠中に服用した場合は必ず妊娠を中断しなければならない"},answer:"B",explanation:"ARBは妊娠中期〜後期に使用すると胎児腎機能障害・羊水過少・頭蓋骨低形成・胎児死亡のリスクがある（禁忌）。妊娠初期についても安全性は確立されていない。妊娠判明後は速やかに安全性が確認されている降圧薬（メチルドパ・ニフェジピン・ラベタロール等）への変更が必要。薬剤師は緊急性を認識して速やかに医師との連携を促す。"},
+  {id:138,difficulty:1,category:"臨床・実務（基礎）",question:"授乳中の28歳女性が「授乳中に薬を飲む場合、いつ飲めば赤ちゃんへの影響が少ないですか？」と質問した。最も適切な回答はどれか。",choices:{A:"薬を飲む前に授乳することで、次の授乳まで血中濃度が下がるため影響を減らせる場合がある",B:"就寝前に飲めばよい",C:"空腹時に飲めば乳汁移行が減る",D:"薬の服用タイミングは乳汁移行量に影響しない",E:"薬を飲んだ直後に授乳すれば最も影響が少ない"},answer:"A",explanation:"多くの薬物は服用後に血中濃度が上昇し（Tmax）、その後低下する。授乳直後に服薬することで、次の授乳時には血中濃度（≒乳汁中濃度）が低下している可能性がある。ただしこの方法はすべての薬物に有効ではなく、薬物の半減期・授乳間隔によって効果が異なる。乳汁移行量が少ない薬（RID<10%）では授乳タイミングの調整はさほど意味がないことも多い。"},
+  {id:139,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠5週の女性が「妊娠に気づかずに市販の総合感冒薬（イブプロフェン・カフェイン・エフェドリン含有）を3日間服用していた」と相談。薬剤師の対応として適切なのはどれか。",choices:{A:"奇形が確実に起きているので妊娠を中断するよう強く勧める",B:"服用期間・量・薬剤内容を確認し、通常の短期使用では奇形リスクが大幅に上昇する可能性は低いことを説明しつつ、産婦人科での相談を促す",C:"イブプロフェンは妊娠初期に禁忌のため直ちに中絶を指示する",D:"問題ないと安易に断言して安心させる",E:"薬剤師は何もアドバイスできないため全て産婦人科に委ねる"},answer:"B",explanation:"妊娠5週・短期間（3日）の市販感冒薬服用では、奇形リスクが著しく高まるとは通常言えない。ただし「確実に大丈夫」とも断言できない。適切な対応は①正確な服用情報を収集②バックグラウンドリスク（自然発生率2〜3%）を含めた情報提供③産婦人科への受診を促す。「奇形が確実」「中絶が必要」などの不適切な発言は患者を傷つける。テラトロジーセンターへの紹介も有用。"},
+  {id:140,difficulty:1,category:"臨床・実務（基礎）",question:"妊娠28週の女性が「足がつる（こむら返り）ので市販の芍薬甘草湯を飲んでいいですか」と相談。適切な対応はどれか。",choices:{A:"漢方薬は自然由来なので妊娠中に安全に使用できると伝える",B:"芍薬甘草湯は甘草（グリチルリチン）を含み、長期大量使用では偽アルドステロン症（低カリウム血症・高血圧）のリスクがある。こむら返りにはまずマグネシウム補給・ストレッチを勧め、薬剤使用は産婦人科医に相談することを促す",C:"すべての漢方薬は妊娠中に禁忌である",D:"足がつる場合はカルシウム剤のみが有効",E:"芍薬甘草湯はこむら返りの第一選択として問題ない"},answer:"B",explanation:"芍薬甘草湯の甘草成分（グリチルリチン）は長期大量使用で偽アルドステロン症（浮腫・高血圧・低カリウム血症）を引き起こす可能性があり、妊娠中の安全性データも限られる。こむら返りにはマグネシウム補充・ストレッチが有効とされ、まず非薬物的対応を勧める。「自然由来＝安全」は誤りであり、漢方薬でもリスクは存在する。使用する場合は産婦人科医への相談を促す。"}
+  ,
+  {id:141,difficulty:2,category:"臨床・実務（応用）",question:"妊娠30週、32歳女性。定期健診で血圧156/98 mmHg、尿タンパク1+、浮腫あり。妊娠高血圧腎症と診断された。産科医から降圧薬の開始が検討されている。この患者に使用すべきでない降圧薬はどれか。",choices:{A:"ニフェジピン（徐放性）",B:"ラベタロール（α・β遮断薬）",C:"エナラプリル（ACE阻害薬）",D:"メチルドパ",E:"ヒドララジン"},answer:"C",explanation:"ACE阻害薬（エナラプリル等）は妊娠中期〜後期に使用すると胎児レニン・アンジオテンシン系阻害により胎児腎機能障害・羊水過少・頭蓋骨低形成・Potter連鎖を引き起こす（禁忌）。ARBも同様に禁忌。妊娠高血圧症候群の降圧薬として使用可能なのは、ニフェジピン（Ca拮抗薬）・ラベタロール・メチルドパ・重症時はヒドララジン（静注）。"},
+  {id:142,difficulty:2,category:"臨床・実務（応用）",question:"妊娠18週の28歳女性。てんかんの既往あり、現在ラモトリギン200mg/日で発作がコントロールされている。妊娠を産婦人科に報告したところ「血中濃度を測ってください」と言われた。なぜ妊娠中にラモトリギン血中濃度の測定が重要か。",choices:{A:"ラモトリギンは妊娠中に腸管吸収が低下するため",B:"妊娠中はGFR増加・代謝酵素誘導によりラモトリギンのクリアランスが著明に増大（2〜3倍）し、血中濃度が大幅に低下して発作が再発するリスクがあるため、投与量調整のために血中濃度モニタリングが必要",C:"ラモトリギンは妊娠中に蓄積して毒性が増強するため",D:"ラモトリギンは胎盤を通過しないため胎児への影響評価が必要",E:"血中濃度測定はラモトリギンには不要で他の目的で測定する"},answer:"B",explanation:"ラモトリギンは主にUGT1A4によりグルクロン酸抱合を受けるが、妊娠中はエストロゲンによるUGT誘導でクリアランスが著明に増大（妊娠初期から上昇、妊娠後期に最大2〜3倍以上）し、血中濃度が有効域以下に低下して発作再発のリスクがある。そのため妊娠中は定期的な血中濃度モニタリングと投与量増量が必要。分娩後は速やかに元の量に戻す。"},
+  {id:143,difficulty:2,category:"臨床・実務（応用）",question:"産後2ヶ月の28歳女性。産後うつと診断され、精神科からエスシタロプラム（SSRI）が処方された。現在完全母乳栄養中。薬剤師の対応として適切なのはどれか。",choices:{A:"SSRIは授乳中に絶対禁忌なので直ちに人工乳に切り替えるよう指示する",B:"エスシタロプラムのRIDは約5〜8%程度で通常の許容範囲内。産後うつの治療を優先しながら授乳継続可能だが、乳児の睡眠変化・興奮性亢進・哺乳量変化等を注意深く観察するよう説明する",C:"産後うつの治療薬は授乳を必ず中止させなければならない",D:"母乳栄養は産後うつには有害なので直ちに断乳を勧める",E:"SSRIはすべて授乳中の安全性が全く確立されていない"},answer:"B",explanation:"エスシタロプラム・セルトラリン等のSSRIは比較的乳汁移行量が少ない（RID：セルトラリン約0.9%、エスシタロプラム約5〜8%）。産後うつの未治療は母子双方に深刻なリスクをもたらすため、授乳継続しながら治療を行うことが多い。Hale評価ではL2〜L3。乳児への影響（睡眠変化・哺乳量変化・体重増加等）を定期的に観察することが重要。"},
+  {id:144,difficulty:2,category:"臨床・実務（応用）",question:"妊娠24週の35歳女性。橋本病（慢性甲状腺炎）による甲状腺機能低下症でレボチロキシン100μg/日を服用中。産科医から「妊娠中はレボチロキシンの必要量が増えることがある」と説明された。その理由として正しいものはどれか。",choices:{A:"妊娠中は甲状腺機能が完全に停止するため",B:"妊娠中はエストロゲン増加によるサイロキシン結合グロブリン（TBG）増加で結合型T4が増加し、さらに胎児の甲状腺機能発達に母体T4が必要なため、レボチロキシン必要量が増大する",C:"妊娠中は腸管吸収が増加してレボチロキシンの必要量が減少する",D:"胎児がレボチロキシンを直接消費するため",E:"妊娠中はTSHが低下するためレボチロキシンが不要になる"},answer:"B",explanation:"妊娠中はエストロゲン増加によりTBGが増加し、より多くのT4が結合型となって遊離T4（活性型）が相対的に低下。また妊娠初期〜中期は胎児の甲状腺が未発達のため母体T4に依存する。さらに胎盤でのT4脱ヨウ素化・腎排泄増加もある。そのため甲状腺機能低下症のレボチロキシン必要量は妊娠中に25〜50%増加することが多く、妊娠初期からTSH・fT4モニタリングと投与量調整が必要。"},
+  {id:145,difficulty:2,category:"臨床・実務（応用）",question:"妊娠36週の28歳女性に切迫早産のため塩酸リトドリン（塩酸リトドリン注射）が投与された。投与開始から6時間後に心拍数120回/分・手指振戦・低カリウム血症（K 3.1 mEq/L）が出現。この副作用の対応として正しいのはどれか。",choices:{A:"これらの症状はリトドリン投与の予測される副作用であり、全く対処の必要はない",B:"リトドリンのβ2刺激によるK細胞内移行・頻脈は予測される副作用。症状の程度に応じて投与量減量・電解質補充を検討し、心電図モニター継続が必要",C:"直ちにプロプラノロール（βブロッカー）を大量投与して拮抗する",D:"低カリウム血症はリトドリンとは無関係である",E:"頻脈はリトドリンの有効性の指標であり目標値は130回/分以上"},answer:"B",explanation:"リトドリン（β2アドレナリン受容体刺激薬）の主な副作用は①頻脈・動悸（β1刺激）②低カリウム血症（β2刺激によるK+の細胞内移行）③振戦④高血糖⑤肺水腫（重症例）。低カリウム血症は補液・カリウム補充で対応。投与量を最低有効量に調整し、心電図・電解質の定期モニタリングが必要。"},
+  {id:146,difficulty:2,category:"臨床・実務（応用）",question:"妊娠20週の32歳女性。気管支喘息で吸入ステロイド（ブデソニド・フォルモテロール配合剤）を使用中。「妊娠中だから喘息の薬をやめたい」と訴えた。薬剤師の対応として最も適切なのはどれか。",choices:{A:"「妊娠中の薬はすべて危険なので中止してください」と伝える",B:"妊娠中の喘息コントロール不良（発作・低酸素血症）は胎児低酸素・早産・低出生体重のリスクとなる。吸入ステロイドは全身曝露が少なく妊娠中も安全性が認められており、自己判断中止は危険と説明し産婦人科・呼吸器科への相談を促す",C:"吸入薬は全身作用がないため無制限に使用できると伝える",D:"β2刺激薬（フォルモテロール）のみ継続してステロイドは中止するよう伝える",E:"妊娠中は喘息薬は経口薬のみに切り替えるよう指示する"},answer:"B",explanation:"妊娠中の喘息管理において、コントロール不良による母体低酸素は胎盤血流低下を引き起こし胎児に重大なリスクをもたらす。吸入ステロイド（特にブデソニド）は妊娠中の安全性データが豊富で、妊娠中でも継続使用が推奨される。β2刺激薬も同様。「薬が怖い」という患者の不安に共感しながら、正確なリスクベネフィット情報を伝えることが薬剤師の重要な役割。"},
+  {id:147,difficulty:2,category:"臨床・実務（応用）",question:"産後6週の30歳女性が血栓性静脈炎の治療中。ワルファリンが処方されているが授乳継続を希望している。薬剤師の情報提供として正しいのはどれか。",choices:{A:"ワルファリンは授乳中に絶対禁忌のため直ちに断乳するよう指示する",B:"ワルファリンは血漿タンパク結合率が高く（99%）乳汁移行量は非常に少ない（RID<1%）。授乳中の使用は一般的に安全とされ、授乳継続可能。乳児へのビタミンK2投与が適切に行われているか確認することが重要",C:"ワルファリンはタンパク結合率が低いため乳汁中に大量移行する",D:"授乳中の抗凝固療法には低分子ヘパリンのみが使用できる",E:"ワルファリン服用中の母親の母乳を飲んだ乳児は必ず出血する"},answer:"B",explanation:"ワルファリンは血漿タンパク結合率99%の酸性薬物で、乳汁（弱アルカリ性）への移行は極めて少ない（RID<1%）。LactMedでも授乳中の使用は安全と評価。ただし新生児は消化管からのビタミンKが少なくワルファリン感受性が高い可能性があるため、乳児へのビタミンK2投与が適切に行われていることを確認する。低分子ヘパリンも授乳中は安全（高分子のため乳汁移行せず）。"},
+  {id:148,difficulty:2,category:"臨床・実務（応用）",question:"妊娠26週の28歳女性。妊娠糖尿病と診断され、食事療法・運動療法を2週間実施したが空腹時血糖110mg/dL・食後2時間血糖165mg/dLと目標未達。次のステップとして最も適切な治療はどれか。",choices:{A:"グリベンクラミド（スルホニルウレア系）を開始する",B:"インスリン療法（ヒトインスリンまたはインスリンアナログ）を開始する",C:"メトホルミンを第一選択として開始する",D:"DPP-4阻害薬（シタグリプチン等）を開始する",E:"食事・運動療法のみで分娩まで様子を見る"},answer:"B",explanation:"妊娠糖尿病で食事・運動療法が不十分な場合、インスリン療法が推奨される。スルホニルウレア系は胎盤通過・新生児低血糖リスクから日本では原則使用しない。メトホルミンは一部の国で使用されるが胎盤通過するため日本の標準治療では推奨されない。DPP-4阻害薬・GLP-1受容体作動薬は妊娠中の安全性未確立。未治療の高血糖は胎児の過剰発育・巨大児・肩甲難産・新生児低血糖のリスクを高める。"},
+  {id:149,difficulty:2,category:"臨床・実務（応用）",question:"産後1ヶ月の27歳女性。完全母乳栄養中。高血圧の再発（血圧152/96 mmHg）のため産科から降圧薬の処方を検討されている。授乳中に使用しやすい降圧薬として適切なのはどれか。",choices:{A:"エナラプリル（ACE阻害薬）は授乳中に禁忌",B:"ニフェジピン（Ca拮抗薬）やラベタロール（α・β遮断薬）は授乳中に使用可能であり、乳汁移行量が少ない",C:"授乳中はすべての降圧薬が禁忌のため断乳が必要",D:"メチルドパは授乳中に禁忌である",E:"ARBは授乳中に最も安全とされる"},answer:"B",explanation:"授乳中の降圧薬選択：ニフェジピン（RID約3%）・ラベタロール（RID約0.5%）・メチルドパは授乳中に使用可能。エナラプリルも授乳中は比較的安全とされる報告もある（乳汁移行少）。ARBは妊娠中禁忌だが授乳中については安全性データが少なく避けるべき。プロプラノロールは乳汁移行量が多くRID約0.5〜3%だが乳児の徐脈注意。授乳中の高血圧は治療が重要で、適切な薬剤選択で授乳継続可能。"},
+  {id:150,difficulty:2,category:"臨床・実務（応用）",question:"妊娠9週の30歳女性。関節リウマチの治療中。現在メトトレキサート（MTX）15mg/週・プレドニゾロン5mg/日を服用していたが、妊娠判明した。薬剤師・医師チームとして最も重要な対応はどれか。",choices:{A:"メトトレキサートは少量なので妊娠中も継続してよい",B:"MTXは強力な催奇形薬（葉酸代謝拮抗）で妊娠中は禁忌のため至急中止。葉酸高用量補充を開始し、産婦人科・リウマチ科と連携して代替治療（プレドニゾロン継続・生物学的製剤等）を検討する",C:"MTXは妊娠中に自然分解するため問題ない",D:"プレドニゾロンも禁忌のため即時中止する",E:"リウマチの薬はすべて中止して無治療にする"},answer:"B",explanation:"MTXはジヒドロ葉酸還元酵素阻害により催奇形性（MTX胎芽症：頭蓋・四肢・顔面奇形）・流産リスクが高く、妊娠中は禁忌。投与終了後3ヶ月以上の避妊が必要とされるほどリスクが高い。妊娠9週では器官形成期が継続中のため緊急の中止と葉酸高用量（5mg/日）補充が必要。プレドニゾロン（低用量）は妊娠中も継続可能なことが多い。リウマチ治療の継続については産婦人科・リウマチ科の連携で判断。"}
+  ,
+  {id:151,difficulty:3,category:"臨床・実務（実践）",question:"妊娠32週の26歳女性。てんかんでバルプロ酸ナトリウム800mg/日服用中。妊娠前から服用しており、変更はしていない。現在まで発作はなし。血中バルプロ酸濃度は75μg/mL（有効域50〜100）。この患者の管理について最も適切な対応はどれか。",choices:{A:"血中濃度が有効域内なので現状維持でよい",B:"バルプロ酸は催奇形リスクが最も高い抗てんかん薬。妊娠32週では器官形成期は過ぎているが発達毒性（IQ低下・自閉スペクトラム症）のリスクは継続。今後の管理（分娩・産後）・葉酸高用量継続・次妊娠前の薬剤変更の可能性について神経内科・産婦人科で多職種連携が必要",C:"妊娠32週は安全期なので催奇形性の心配はない",D:"すぐにバルプロ酸を中止してラモトリギンに変更する",E:"バルプロ酸は授乳中には安全なので産後の授乳は問題ない"},answer:"B",explanation:"バルプロ酸の催奇形リスクは器官形成期（妊娠初期）に最大だが、神経発達毒性（IQ低下平均約8〜10点・自閉スペクトラム症リスク増加）は妊娠全期間・授乳期を通じて懸念される。妊娠32週での急な薬剤変更は発作再発リスクが高く危険。現実的には①葉酸5mg/日継続②定期的血中濃度測定③分娩後の児の神経発達フォロー④次妊娠計画時にバルプロ酸以外の選択肢を事前に検討⑤授乳については個別判断（乳汁移行あり、RID約1〜4%）。"},
+  {id:152,difficulty:3,category:"臨床・実務（実践）",question:"人工心臓弁置換術後でワルファリン（INR目標2.0〜3.0）を服用中の32歳女性が第1子を妊娠（妊娠6週）した。抗凝固療法の管理として最も適切な方針はどれか。",choices:{A:"妊娠中はすべての抗凝固薬が禁忌なので直ちに中止する",B:"妊娠6〜12週のワルファリン曝露は胎児性ワルファリン症候群リスクがある。一般には妊娠6〜12週は低分子ヘパリン（LMWH）かヘパリンへの切り替えを検討するが、機械弁の血栓リスクも高いため産婦人科・循環器科・血液内科による個別リスクベネフィット評価が必須",C:"機械弁術後はワルファリン継続が絶対的に優先されるため妊娠中も継続",D:"低分子ヘパリンは妊娠中に禁忌",E:"アスピリン（低用量）のみで抗血栓療法として十分"},answer:"B",explanation:"機械弁置換術後の抗凝固療法管理は妊娠中に最も複雑な問題の一つ。ワルファリンは妊娠6〜12週の胎児性ワルファリン症候群リスクがあるが、LMWHへの変更では血栓塞栓リスクが高まる（特に機械弁）。欧州・米国ガイドラインでも機械弁妊娠の管理は施設ごとに異なり、ワルファリン継続/LMWH切り替え/ワルファリン用量調整等を個別評価する。低分子ヘパリンは胎盤通過せず胎児には安全。多職種連携が必須。"},
+  {id:153,difficulty:3,category:"臨床・実務（実践）",question:"授乳中（生後3ヶ月）の25歳女性。双極性障害でリチウム600mg/日服用中。授乳継続の可否について相談。リチウムの授乳への影響を評価する上で最も重要な点はどれか。",choices:{A:"リチウムは乳汁移行量が少ないため授乳に問題ない",B:"リチウムは乳汁移行量がSSRIより多く（RID約12〜30%）、治療域が狭い。乳児の腎機能未熟によるリチウム蓄積リスク・中毒症状（哺乳不良・振戦・チアノーゼ等）のリスクを慎重に評価し、乳児血中リチウム濃度モニタリングを行いながら授乳継続を判断する必要がある",C:"双極性障害の薬は授乳中に常に禁忌",D:"リチウムは半減期が短いため授乳への影響はすぐ消える",E:"生後3ヶ月以降は乳児の代謝能が完全に成熟している"},answer:"B",explanation:"リチウムはRIDが約12〜30%と比較的高く（一般的許容目安<10%）、治療域が狭い（血中濃度0.6〜1.2 mEq/L）。乳児は腎機能が未熟でリチウム排泄が遅いため蓄積リスクがある。脱水・発熱時はリスクが上昇。授乳継続する場合は乳児の血中リチウム濃度・腎機能モニタリング、症状観察が必須。精神科・産婦人科・小児科の連携のもとで個別判断。断乳を選択する場合もある。"},
+  {id:154,difficulty:3,category:"臨床・実務（実践）",question:"妊娠28週の34歳女性。SLE（全身性エリテマトーデス）でヒドロキシクロロキン（HCQ）200mg/日を服用中。「妊娠したからHCQを止めたい」と言う。薬剤師・医師として適切な対応はどれか。",choices:{A:"妊娠中はすべての抗リウマチ薬を中止すべきなのでHCQも中止する",B:"HCQはSLEの妊娠管理に重要。妊娠中のHCQ継続はSLE再燃リスクを低下させ、流産・早産・IUGR予防にも有益とされる。催奇形性のエビデンスはなく、妊娠中も継続することが国際ガイドラインで推奨されている",C:"HCQは分子量が大きいため胎盤を通過しない",D:"HCQの代わりにメトトレキサートへ変更する",E:"HCQは授乳中のみ使用可能で妊娠中は禁忌"},answer:"B",explanation:"HCQ（ヒドロキシクロロキン）はSLE管理の基本薬。妊娠中のSLE再燃を抑制し、胎盤機能維持・流産・早産・低出生体重・新生児ループスの減少に有益。複数の大規模観察研究で催奇形性はないとされ、ACR・EULARガイドラインともに妊娠中継続を推奨。中止によるSLE再燃リスクのほうが胎児への影響よりはるかに大きい。患者の誤解を解き、正確な情報提供を行うことが重要。"},
+  {id:155,difficulty:3,category:"臨床・実務（実践）",question:"妊娠中にSSRI（パロキセチン20mg/日）を服用していた母親から生まれた男児（在胎38週、正期産）。出生6時間後から高調な啼泣・振戦・哺乳力低下・多呼吸が出現。この臨床像として考慮すべきことはどれか。",choices:{A:"これは正常な新生児の生理的な状態である",B:"母体のSSRI服用による新生児遷延性症候群（NAS/新生児薬物調整症候群）の可能性。症状は出生後24〜48時間以内に出現し、通常2週間以内に改善。哺乳支援・保温・必要に応じてNICU管理が必要",C:"これはSSRIによる新生児の重篤な奇形である",D:"症状はパロキセチンの胎内蓄積によるものではなく感染症を疑う",E:"SSRIによる新生児への影響はないためこれは偶然の一致"},answer:"B",explanation:"SSRIは胎盤を通過し、出生後に薬物供給が断たれると新生児に一過性の神経適応症状（哺乳不良・振戦・高調啼泣・過活動・低体温・まれに痙攣・新生児遷延性肺高血圧PPHN）が出現することがある。症状は通常48時間以内に出現し、1〜2週間で改善。パロキセチンは半減期が長く特に症状が出やすいとされる。NICUによる支持療法が中心。妊娠後期のSSRIのtaperingは発作再燃リスクがあり推奨されない場合が多い。"},
+  {id:156,difficulty:3,category:"臨床・実務（実践）",question:"オピオイド依存症の治療としてメサドン維持療法（MMT）を受けている妊娠22週の28歳女性。産婦人科から「分娩後に新生児薬物離脱症候群（NAS）が生じる予定」と説明があった。分娩後の新生児管理として最も適切なのはどれか。",choices:{A:"メサドン服用中の母親の児は必ず奇形があるため精密検査が必要",B:"NAS発症の可能性があるため、出生後少なくとも5〜7日間（MMTの場合はより長期）の新生児モニタリング（Finnegan Score等による評価）を行い、症状が重篤な場合はモルヒネや経口メサドンで管理する",C:"メサドン服用中の母親はすべて帝王切開が必要",D:"NASは予防できないため特別な管理は不要",E:"母体のメサドン投与量を出産1週前から急減させてNASを防ぐ"},answer:"B",explanation:"MMT中の妊婦から生まれる新生児はほぼ全例でNASを発症するが、適切に管理すれば重篤な転帰は防げる。症状出現時期はメサドンの長い半減期から出生後24〜72時間以降が多い。Finnegan Neonatal Abstinence Scoring（FNAS）でスコア評価し、スコアが高い場合はモルヒネ（経口）や低用量メサドンで薬物療法を行う。母体のMMT急減量はヘロイン再使用リスクを高め禁忌。母乳育児はMMT継続中でも（HIV陰性・他の禁忌なければ）奨励される場合がある。"},
+  {id:157,difficulty:3,category:"臨床・実務（実践）",question:"妊娠8週の30歳女性。既往にクローン病あり、インフリキシマブ（抗TNF-α抗体）5mg/kg 8週ごとで維持療法中。妊娠継続を希望。抗TNF-α抗体の妊娠中使用について正しいのはどれか。",choices:{A:"インフリキシマブは分子量が大きいため妊娠初期は胎盤をほとんど通過せず催奇形リスクは低い。ただし妊娠後期（妊娠22〜24週以降）はFcRn受容体を介した能動輸送で胎盤通過量が増加し、生まれた児の血中に最大6ヶ月間残存することがあるため、新生児への生ワクチン接種に注意が必要",B:"インフリキシマブは妊娠全期間を通じて完全に安全である",C:"インフリキシマブは分子量が小さいため妊娠全期間を通じて大量に胎盤を通過する",D:"生物学的製剤は妊娠中すべて禁忌",E:"インフリキシマブは胎盤を通過しないため新生児への影響は全くない"},answer:"A",explanation:"インフリキシマブ（IgG1型モノクローナル抗体、分子量約150kDa）は妊娠初期〜中期は胎盤通過量が少ないが、妊娠後期はFcRn（新生児Fc受容体）を介した能動輸送で胎盤通過が増大し、新生児血中で母体より高濃度になることもある。児の血中抗体は生後6ヶ月程度持続。そのため母体がインフリキシマブを投与されていた場合、生まれた児への生ワクチン（BCG等）は生後6ヶ月以降に行う。クローン病の活動期は胎盤炎症・早産リスクがあり、寛解維持の重要性とのバランスを考慮。"},
+  {id:158,difficulty:3,category:"臨床・実務（実践）",question:"妊娠20週の32歳女性。HIV感染症で抗HIV療法（ART）を継続中。テノホビル・エムトリシタビン・リルピビリン配合剤を服用。「妊娠中だから薬を止めたい」と訴えた。最も適切な対応はどれか。",choices:{A:"妊娠中の抗HIV療法は胎児に有害なので中止する",B:"妊娠中のART継続は①母体のCD4数維持・日和見感染予防②母子感染予防（ART継続で母子感染率を0.1〜1%まで低下）に必須。自己判断中止は母体・児双方に重大なリスクをもたらすため、産婦人科・感染症科と連携して安全に継続する",C:"HIV感染妊婦は必ず帝王切開で分娩するためARTは不要",D:"妊娠中はARTをジドブジン単剤に変更するのが標準治療",E:"ARTを中止して分娩後に再開すれば母子感染は防げる"},answer:"B",explanation:"妊娠中のART継続は母子感染予防の要。適切なART継続（血中ウイルス量の抑制）により、分娩時の母子感染率は0.1〜1%未満まで低下（未治療では約15〜45%）。現代のARTレジメンは多くが妊娠中の安全性データを有する。テノホビル・エムトリシタビンは妊娠中も使用可能。リルピビリンは食事との服用が必要で妊娠悪阻時に注意。自己判断中止でウイルス量が上昇すると母子感染・薬剤耐性リスクが増大。"},
+  {id:159,difficulty:3,category:"臨床・実務（実践）",question:"産後5日目の28歳女性。帝王切開後で術後疼痛管理のためモルヒネ（経口徐放剤）が処方されている。完全母乳で授乳中。乳児への影響評価として最も重要な観察点はどれか。",choices:{A:"モルヒネは乳汁移行しないため観察不要",B:"モルヒネは乳汁に移行し（RID約4〜9%）、授乳された乳児に中枢神経抑制（哺乳力低下・過度な眠気・呼吸抑制）が生じる可能性がある。特に新生児は血液脳関門未発達・モルヒネ代謝能低く感受性高い。乳児の哺乳量・睡眠パターン・呼吸数・皮膚色を慎重に観察する",C:"帝王切開後のオピオイドはすべて授乳中禁忌のため断乳が必要",D:"モルヒネの乳汁移行は生後7日目以降に生じる",E:"徐放製剤は乳汁移行しない"},answer:"B",explanation:"モルヒネはRID約4〜9%で、乳汁移行量は低くはないが完全断乳を必ずしも要する程ではない。ただし新生児（生後5日目）はBBBが未熟でオピオイド感受性が高く、中枢神経抑制リスクに注意が必要。現実的には術後疼痛管理としてアセトアミノフェン・NSAID（授乳中短期は許容）を優先し、オピオイドは最低有効量・最短期間とする。乳児の哺乳力・意識レベル・呼吸状態の観察が重要。アセトアミノフェン注（パラセタモール）は授乳中の安全性が高い。"},
+  {id:160,difficulty:3,category:"臨床・実務（実践）",question:"妊娠16週の30歳女性。精神科でクロザピン（非定型抗精神病薬）300mg/日を服用中。治療抵抗性統合失調症で、クロザピンにより初めて安定した。妊娠中の管理について最も重要な考慮点はどれか。",choices:{A:"クロザピンは妊娠中に安全性が最も確立された抗精神病薬",B:"クロザピンは農粒球減少症リスク（定期的血液検査が必要）に加え、妊娠中は胎児への曝露（鎮静・錐体外路症状）と精神症状再燃リスクのバランスを多職種チーム（精神科・産婦人科・薬剤師・社会福祉士）で慎重に評価し、投与継続・他剤変更・産後計画について意思決定を支援する",C:"クロザピンは農粒球減少症リスクがあるため妊娠中は直ちに中止",D:"治療抵抗性統合失調症でも妊娠中は薬物療法は不要",E:"クロザピンは分子量が大きいため胎盤を通過しない"},answer:"B",explanation:"クロザピンは治療抵抗性統合失調症に唯一有効な場合もある重要な薬剤。妊娠中の課題は①農粒球減少症モニタリング（定期血液検査の継続）②胎盤通過による新生児への影響（鎮静・錐体外路症状・NAS）③体重増加・糖尿病リスク（妊娠糖尿病との複合）④精神症状再燃リスク。急な中止は重篤な精神症状再燃を招く。催奇形性は低いとされるが妊娠中安全性データは限られる。多職種チームによる個別化された意思決定が必須。"}
+];
+  const isCorrect = selected === q.answer;
+  if (isCorrect) score++;
+  userAnswers.push({ q, selected, isCorrect });
+
+  // 全ボタン無効化 & ハイライト
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(btn => {
+    btn.disabled = true;
+    const label = btn.querySelector('.choice-label').textContent;
+    if (label === q.answer) btn.classList.add('correct');
+    else if (label === selected && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // フィードバックバナー
+  const fb = document.getElementById('feedbackBanner');
+  if (isCorrect) {
+    fb.className = 'feedback-banner correct-fb show';
+    fb.innerHTML = '✅ 正解！';
+  } else {
+    fb.className = 'feedback-banner wrong-fb show';
+    fb.innerHTML = `❌ 不正解　正解は <strong>${q.answer}</strong>`;
+  }
+
+  // 解説
+  document.getElementById('explanationText').textContent = q.explanation;
+  document.getElementById('explanationCard').className = 'explanation-card show';
+
+  // スコア更新
+  document.getElementById('scoreText').textContent = `正解: ${score}`;
+
+  // 次へボタン
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.className = 'next-btn show';
+  const isLast = currentIndex >= currentList.length - 1;
+  nextBtn.textContent = isLast ? '結果を見る ›' : '次の問題 →';
+}
+
+// ===== 次の問題 =====
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentList.length) {
+    showResult();
+  } else {
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+// ===== 結果画面 =====
+function showResult() {
+  showScreen('screenResult');
+  window.scrollTo(0, 0);
+  const total = currentList.length;
+  const pct = Math.round((score / total) * 100);
+
+  let emoji = '😢';
+  let msg = 'もう少し復習が必要です。';
+  if (pct >= 90) { emoji = '🏆'; msg = '素晴らしい！完璧に近い正答率です！'; }
+  else if (pct >= 70) { emoji = '🎉'; msg = 'よくできました！苦手な分野を重点的に復習しましょう。'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'あと一歩！解説を読んで再チャレンジしてみましょう。'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultDenom').textContent = `/ ${total} 問`;
+  document.getElementById('resultPct').textContent = `正答率 ${pct}%`;
+  document.getElementById('resultMsg').textContent = msg;
+
+  const list = document.getElementById('answerList');
+  list.innerHTML = '<div style="font-weight:700;font-size:14px;margin-bottom:12px;color:#1e293b;">📋 解答一覧</div>';
+  userAnswers.forEach((ua, i) => {
+    const div = document.createElement('div');
+    div.className = 'answer-item';
+    div.innerHTML = `
+      <div class="ans-q">Q${i+1}. ${ua.q.question}</div>
+      <div class="ans-result">
+        <span class="ans-badge ${ua.isCorrect ? 'ok' : 'ng'}">${ua.isCorrect ? '正解' : '不正解'}</span>
+        <span style="color:#64748b">あなた: <strong>${ua.selected}</strong>　正解: <strong>${ua.q.answer}</strong></span>
+      </div>
+      ${!ua.isCorrect ? `<div style="margin-top:6px;font-size:12px;color:#78350f;background:#fffbeb;border-radius:6px;padding:6px 8px;">${ua.q.explanation}</div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ===== 画面切替 =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  showScreen('screenStart');
+}
+
+// ===== 初期化 =====
+buildCatList();
+</script>
+</body>
+</html>
