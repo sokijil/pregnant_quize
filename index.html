@@ -1766,7 +1766,8 @@ const quizData = [
      E:"産後うつの薬物療法は産後1か月以内に必ず完了するものであり長期管理は不要である"
    },
    answer:"B",
-   explanation:"周産期メンタルヘルスの多職種連携体制：①産婦人科医：スクリーニング（EPDS）・妊娠管理、②精神科医：診断・薬物療法、③助産師：育児支援・授乳指導、④保健師：アウトリーチ・家庭訪問・産後ケア事業コーディネート、⑤心理士：認知行動療法・カウンセリング、⑥社会福祉士：社会資源活用・経済的支援、⑦薬剤師：服薬支援・授乳安全性情報提供・副作用モニタリング。産後うつへのSSRI（セルトラリン・パロキセチン等）はRIDが低いものが多く（セルトラリンRID約0.5〜3%）授乳継続が可能な場合がある（個別評価が必要）。];
+   explanation:"周産期メンタルヘルスの多職種連携体制：①産婦人科医：スクリーニング（EPDS）・妊娠管理、②精神科医：診断・薬物療法、③助産師：育児支援・授乳指導、④保健師：アウトリーチ・家庭訪問・産後ケア事業コーディネート、⑤心理士：認知行動療法・カウンセリング、⑥社会福祉士：社会資源活用・経済的支援、⑦薬剤師：服薬支援・授乳安全性情報提供・副作用モニタリング。産後うつへのSSRI（セルトラリン・パロキセチン等）はRIDが低いものが多く（セルトラリンRID約0.5〜3%）授乳継続が可能な場合がある（個別評価が必要）。"}
+];
 
 // ===== 薬物動態カテゴリ定義 =====
 const PK_CATEGORIES = ["妊娠中の薬物動態", "胎盤通過性", "母乳移行性"];
@@ -1843,7 +1844,7 @@ function toggleSub(subId, btn) {
   if (arrow) arrow.textContent = isOpen ? '∨' : '›';
   btn.classList.toggle('open', isOpen);
   // 他のサブボタンを閉じる
-  ['subPharma', 'subPK', 'subAll', 'subPerinatal', 'subFetal', 'subComplication', 'subCongenital', 'subResearch', 'subNutrition', 'subRisk', 'subDiffEasy', 'subDiffMid', 'subDiffHard', 'subClinical', 'subNational'].forEach(id => {
+  ['subPharma', 'subPK', 'subAll', 'subPerinatal', 'subFetal', 'subComplication', 'subCongenital', 'subResearch', 'subNutrition', 'subRisk', 'subDiffEasy', 'subDiffMid', 'subDiffHard', 'subClinical', 'subNational', 'subInfection', 'subObstetrics', 'subNeonatal', 'subTeratology', 'subRegulation', 'subSocial'].forEach(id => {
     if (id !== subId) {
       document.getElementById(id).classList.remove('open');
       const a = document.getElementById(arrowMap[id]);
