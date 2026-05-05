@@ -2067,23 +2067,27 @@ function renderQuestion() {
   catBadge.innerHTML = q.category + (q.difficulty ? ' <span class="diff-badge ' + (diffClass[q.difficulty]||'d2') + '">' + (diffLabel[q.difficulty]||'') + '</span>' : '');
   document.getElementById('questionText').textContent = `Q${currentIndex + 1}. ${q.question}`;
 
-  // 選択肢をシャッフル
-  const letters = ['A','B','C','D','E'];
-  const correctText = q.choices[q.answer];
-  const texts = letters.map(l => q.choices[l]);
-  for (let i = texts.length - 1; i > 0; i--) {
+  // 選択肢をシャッフル（インデックスベース）
+  const origKeys = ['A','B','C','D','E'];
+  const dispKeys = ['A','B','C','D','E'];
+  // ランダムな並び替えインデックスを生成
+  const order = [0,1,2,3,4];
+  for (let i = order.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [texts[i], texts[j]] = [texts[j], texts[i]];
+    const tmp = order[i]; order[i] = order[j]; order[j] = tmp;
   }
-  currentShuffledAnswer = letters[texts.indexOf(correctText)];
-
+  // 正解の元のキー（A〜E）をもとに表示上のキーを追跡
+  currentShuffledAnswer = '';
   const choicesWrap = document.getElementById('choicesWrap');
   choicesWrap.innerHTML = '';
-  letters.forEach((key, idx) => {
+  dispKeys.forEach((dispKey, pos) => {
+    const origKey = origKeys[order[pos]];
+    const text = q.choices[origKey] || '';
+    if (origKey === q.answer) currentShuffledAnswer = dispKey;
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
-    btn.innerHTML = `<span class="choice-label">${key}</span><span>${texts[idx]}</span>`;
-    btn.onclick = () => selectAnswer(key, btn);
+    btn.innerHTML = '<span class="choice-label">' + dispKey + '</span><span>' + text + '</span>';
+    btn.onclick = (function(k){ return function(){ selectAnswer(k, this); }; })(dispKey);
     choicesWrap.appendChild(btn);
   });
 
