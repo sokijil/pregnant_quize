@@ -552,6 +552,18 @@
       </div>
     </div>
 
+    <!-- 苦手問題優先 -->
+    <div class="section-block">
+      <button class="mode-btn" style="border-color:#f97316;" onclick="startWeakMode()">
+        <span class="btn-icon">📊</span>
+        <div>
+          <div class="btn-label">苦手問題優先</div>
+          <div class="btn-sub">正答率の低い問題から出題</div>
+        </div>
+        <span class="arrow">›</span>
+      </button>
+    </div>
+
     <!-- 難易度別 -->
     <div class="section-title" style="margin-top:16px;">難易度・出題スタイル</div>
     <div class="section-block">
@@ -1772,7 +1784,7 @@ const quizData = [
    question:"薬剤師が妊娠後期患者の腎機能評価のため血清クレアチニン値を確認したところ0.5mg/dLと基準値下限を下回っていた。担当医は「妊娠による正常変化」と説明した。この根拠として最も正しいものはどれか。",
    choices:{
      A:"妊娠後期は筋肉量の変化によりクレアチニン産生量が低下し血清値が低値となる",
-     B:"妊娠中は腎血流量とGFRが約50%増加しクレアチニンクリアランスが亢進するため血清クレアチニン値は生理的に低下する",
+     B:"妊娠中はGFRが約50%増加しクレアチニンクリアランスが亢進するため血清クレアチニン値は生理的に低下する",
      C:"妊娠中は尿細管でのクレアチニン再吸収が亢進し血清値は低下するが実際の腎機能は低下している",
      D:"妊娠後期の血清クレアチニン0.5mg/dLは腎機能障害を示す異常値であり専門医への紹介が必要な所見である",
      E:"妊娠中の腎機能はほとんど変化せず0.5mg/dLは測定誤差の範囲内であり通常の基準値で評価すべきである"
@@ -1784,7 +1796,7 @@ const quizData = [
    question:"妊娠12週健診時に患者が「つわりで3週間市販薬を飲んでいた。でも器官形成期を過ぎたから赤ちゃんへの影響はないと友人に聞いた」と話した。この認識に対する薬剤師の正しい対応はどれか。",
    choices:{
      A:"友人の説明は正しく妊娠12週を超えれば器官形成は完成し薬剤の胎児への影響はほぼなくなる",
-     B:"主要臓器の臨界期（3〜8週）は終了しているが口蓋（10〜12週）や外性器（8〜15週）の形成は継続中であり12週以降も薬剤の影響がゼロとは言えないことを丁寧に説明する",
+     B:"器官形成の臨界期は臓器ごとに異なり口蓋は〜12週・外性器は〜15週まで続くため12週以降も一部の薬剤リスクは存在する",
      C:"妊娠12週は器官形成の最盛期であり服用した薬剤を直ちに中止し緊急の奇形スクリーニングを指示する",
      D:"妊娠12週以降は胎盤バリア機能が完成し薬剤は胎盤を通過しなくなるため安全であると説明してよい",
      E:"市販薬は全て安全性が確認されているため器官形成期内でも胎児への重大な影響は心配不要である"
@@ -1796,7 +1808,7 @@ const quizData = [
    question:"てんかん合併妊婦がバルプロ酸900mg/日継続中で「葉酸4mg/日を毎日飲んでいるから神経管閉鎖障害は大丈夫」と確信している。この認識への正しい対応はどれか。",
    choices:{
      A:"患者の認識は正しく葉酸4mg/日を服用すれば神経管閉鎖障害リスクは一般妊婦と同等まで低下する",
-     B:"葉酸補充は神経管閉鎖障害リスクを低減する可能性があるが完全予防はできない。バルプロ酸は葉酸拮抗機序に加えHDAC阻害作用でも催奇形性を示すため葉酸服用のみで安心させるべきでない",
+     B:"バルプロ酸はHDAC阻害を含む複数機序で催奇形性を示し葉酸補充だけでは不十分なため葉酸服用のみで安心させるべきでない",
      C:"バルプロ酸はHDAC阻害薬であるため葉酸とは全く関係がなく葉酸補充は無効であり即時中止が必要である",
      D:"葉酸は4mg/日でなく0.4mg/日が正しい量であり4mg/日は過剰摂取として有害であるため減量を指示する",
      E:"バルプロ酸による神経管閉鎖障害リスクは一般妊婦と同等であり葉酸を含む特別な対策は不要である"
@@ -1808,7 +1820,7 @@ const quizData = [
    question:"薬局勤務の双胎（双子）妊娠28週の患者から「産前休業はいつから取れますか？単胎の友人は6週前と聞いたが私も同じですか？」と相談を受けた。労働基準法上の正しい説明はどれか。",
    choices:{
      A:"産前休業の取得開始時期は単胎・多胎を問わず一律で出産予定日の6週前と法定されている",
-     B:"労働基準法では単胎妊娠は出産予定日の6週前・多胎妊娠（双胎以上）は14週前から産前休業を取得できるため双胎の場合は単胎の友人より8週長い産前休業が認められる",
+     B:"単胎は出産予定日の6週前・双胎以上の多胎は14週前から産前休業を取得でき双胎の場合は友人より8週早く開始できる",
      C:"双胎妊娠では産前休業を出産予定日の20週前から取得できる特例規定がある",
      D:"産前休業の取得期間は法律ではなく雇用主との個別交渉で決まり法定の基準は存在しない",
      E:"多胎妊娠の産前休業制度は廃止され現在は単胎・多胎共通で6週前から取得する制度に統一されている"
@@ -1820,7 +1832,7 @@ const quizData = [
    question:"妊婦健診来局時に患者が「出産費用の補助を調べたら42万円と書いてあったが最近変わりましたか？」と質問した。現行制度における正しい情報を選べ。",
    choices:{
      A:"出産育児一時金は現在も42万円のままであり制度変更はなく42万円という情報は正確である",
-     B:"2023年4月より出産育児一時金は50万円（産科医療補償制度加算含む）に引き上げられた。42万円は2022年以前の旧額であり患者に正確な最新情報を提供すべきである",
+     B:"2023年4月より出産育児一時金は50万円（産科医療補償制度加算含む）に引き上げられており42万円は旧額である",
      C:"出産育児一時金は廃止され出産費用の全額公費負担制度に変更されたため申請は不要になった",
      D:"出産育児一時金は世帯収入に応じて金額が変動し一律50万円ではないため個別に確認が必要である",
      E:"出産育児一時金の増額は2025年度から実施予定であり現時点ではまだ42万円が正しい金額である"
@@ -1832,7 +1844,7 @@ const quizData = [
    question:"妊娠28週の患者のヘモグロビン（Hb）値が10.5g/dLで主治医から「妊娠性貧血」と診断された。妊婦のHb低下の評価として最も正しい記述を選べ。",
    choices:{
      A:"非妊娠時と同様にHb 12g/dL未満は全て鉄欠乏性貧血として直ちに鉄剤投与を開始すべきである",
-     B:"妊娠中は血漿量が約40〜50%増加するのに対し赤血球量の増加は約20〜30%にとどまるため相対的にHbが低下する生理的貧血が生じる。Hb低下が全て鉄欠乏とは限らずMCV・フェリチン・血清鉄で鑑別してから治療を判断すべきである",
+     B:"妊娠中は血漿量の増加が赤血球増加を上回り相対的にHbが低下する生理的貧血が生じるためHb低下が全て鉄欠乏ではない",
      C:"妊娠中はHb 9g/dL未満でも生理的変化の範囲内であり輸血を含む治療は一切不要である",
      D:"妊娠中は血漿量が減少するため非妊娠時よりHb値は上昇する傾向にあり10.5g/dLは著明な低下を示す",
      E:"妊娠中のHb低下はすべて葉酸欠乏が原因であるため鉄剤でなく葉酸補充のみで対応すれば十分である"
@@ -1844,7 +1856,7 @@ const quizData = [
    question:"出産直後の母親が「完全母乳育児をするので赤ちゃんへのビタミンK投与は自然でないから断りたい」と相談した。正しい対応を選べ。",
    choices:{
      A:"完全母乳は最も自然で栄養も十分なためビタミンKも十分に含まれており投与を断っても問題ない",
-     B:"母乳はビタミンK含有量が非常に少なく新生児は腸内細菌叢も未成熟でビタミンKを自己合成できないため、ビタミンK2シロップを投与しないと頭蓋内出血を含む新生児ビタミンK欠乏性出血症のリスクがあると丁寧に説明する",
+     B:"母乳はビタミンK含有量が少なく新生児は自己合成も不十分なためK2シロップ未投与では頭蓋内出血を含む出血症のリスクがある",
      C:"ビタミンK欠乏性出血症は人工乳（ミルク）育児児にのみ生じ母乳育児の新生児は自然に保護されている",
      D:"ビタミンK投与は生後1か月健診時の1回のみで十分であり出生直後の投与は医学的根拠が乏しい",
      E:"新生児は胎盤からビタミンKを十分に受け取っているため出生後数か月間は補充が不要である"
@@ -1856,7 +1868,7 @@ const quizData = [
    question:"高血圧既往の妊婦が「妊娠に気づいた16週までACE阻害薬を服用していた。器官形成期（3〜8週）は過ぎていたので催奇形性の心配はない」と話した。正しい対応を選べ。",
    choices:{
      A:"患者の認識は正しく器官形成期（3〜8週）終了後のACE阻害薬曝露では催奇形性リスクはなく安心してよい",
-     B:"ACE阻害薬の主要な胎児毒性（胎児腎毒性・乏尿・羊水過少・腎尿細管異形成・頭蓋骨低形成）は妊娠中期（14週以降）にアンジオテンシンIIの腎機能制御が重要になる時期から顕在化するため16週まで服用した場合は胎児評価が必要である",
+     B:"ACE阻害薬の主な胎児毒性（腎毒性・羊水過少・腎尿細管異形成）は妊娠中期以降に顕在化するため器官形成期終了後でもリスクが残存する",
      C:"ACE阻害薬は妊娠初期のみ催奇形性を示し中期以降は安全に使用継続できる降圧薬である",
      D:"ACE阻害薬は胎盤通過性が低く胎児循環への影響はほとんどないため妊婦でも通常通り継続可能である",
      E:"ACE阻害薬の胎児毒性は主に心奇形であり腎毒性の報告は存在せず腎機能の評価は不要である"
@@ -1868,7 +1880,7 @@ const quizData = [
    question:"添付文書の「特定の背景を有する患者に関する注意」に「妊婦への投与：有益性が危険性を上回ると判断される場合にのみ投与すること」と記載された薬剤の妊婦への使用を検討している。正しい解釈を選べ。",
    choices:{
      A:"「禁忌」の記載がなく条件付きで投与可とされているため安全性が確認された薬剤であり積極的に使用できる",
-     B:"この記載は安全性データが不十分または動物実験でリスクが示唆されることを意味し、禁忌でないことと安全であることは別であるため個別のリスクベネフィット評価・代替薬の検討・患者への十分な説明が必要である",
+     B:"禁忌ではないが安全性データが不十分な薬剤であることを示し代替薬の検討と個別のリスクベネフィット評価が必要である",
      C:"「禁忌」より一段階安全な薬剤を示す記載であり妊婦への第一選択として積極的に用いてよい",
      D:"2022年改訂の添付文書新記載要領ではこの表現は廃止されており現在の添付文書には存在しない記述である",
      E:"この記載は全ての薬剤に共通する一般的な免責表現であり薬剤固有の安全性情報とは関係がない"
@@ -1880,7 +1892,7 @@ const quizData = [
    question:"産後2週間健診でEPDS（エジンバラ産後うつ病質問票）を実施したところ患者のスコアは7点だった。薬剤師として最も適切な対応を選べ。",
    choices:{
      A:"EPDSのカットオフ値は9点以上であるため7点は正常範囲内であり産後うつの心配はなく特別な対応は不要である",
-     B:"EPDS総スコア7点はカットオフ以下だが自傷・自殺念慮を問う第10項目（「自分を傷つけるという考えが浮かんだ」）が1点以上の場合は総スコアに関わらず緊急評価が必要であり各項目の内容を確認することが重要である",
+     B:"EPDS総スコアが低くても自傷念慮を問う第10項目が1点以上なら合計スコアに関わらず緊急評価が必要であり各項目を確認すべきである",
      C:"EPDSは産後うつの確定診断ツールであり7点の患者は産後うつと診断されないため抗うつ薬処方や専門紹介は不可である",
      D:"産後うつスクリーニングは産後1か月健診でのみ実施するものであり産後2週時点でのEPDS評価は推奨されていない",
      E:"EPDSは自己記入式であるため専門的解釈は不要で患者本人が問題ないと感じていれば7点でも心配不要である"
@@ -1917,6 +1929,22 @@ let currentIndex = 0;
 let score = 0;
 let userAnswers = [];
 let answered = false;
+let currentShuffledAnswer = '';
+
+// ===== 正答率ログ（localStorage）=====
+function getQuizStats() {
+  try { return JSON.parse(localStorage.getItem('quizStats') || '{}'); } catch(e) { return {}; }
+}
+function saveQuizStats(stats) {
+  try { localStorage.setItem('quizStats', JSON.stringify(stats)); } catch(e) {}
+}
+function recordQuizAnswer(questionId, isCorrect) {
+  const stats = getQuizStats();
+  if (!stats[questionId]) stats[questionId] = {a:0, c:0};
+  stats[questionId].a++;
+  if (isCorrect) stats[questionId].c++;
+  saveQuizStats(stats);
+}
 
 // ===== カテゴリリスト構築 =====
 function buildCatList() {
@@ -2039,12 +2067,22 @@ function renderQuestion() {
   catBadge.innerHTML = q.category + (q.difficulty ? ' <span class="diff-badge ' + (diffClass[q.difficulty]||'d2') + '">' + (diffLabel[q.difficulty]||'') + '</span>' : '');
   document.getElementById('questionText').textContent = `Q${currentIndex + 1}. ${q.question}`;
 
+  // 選択肢をシャッフル
+  const letters = ['A','B','C','D','E'];
+  const correctText = q.choices[q.answer];
+  const texts = letters.map(l => q.choices[l]);
+  for (let i = texts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [texts[i], texts[j]] = [texts[j], texts[i]];
+  }
+  currentShuffledAnswer = letters[texts.indexOf(correctText)];
+
   const choicesWrap = document.getElementById('choicesWrap');
   choicesWrap.innerHTML = '';
-  ['A','B','C','D','E'].forEach(key => {
+  letters.forEach((key, idx) => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
-    btn.innerHTML = `<span class="choice-label">${key}</span><span>${q.choices[key]}</span>`;
+    btn.innerHTML = `<span class="choice-label">${key}</span><span>${texts[idx]}</span>`;
     btn.onclick = () => selectAnswer(key, btn);
     choicesWrap.appendChild(btn);
   });
@@ -2060,16 +2098,17 @@ function selectAnswer(selected, clickedBtn) {
   if (answered) return;
   answered = true;
   const q = currentList[currentIndex];
-  const isCorrect = selected === q.answer;
+  const isCorrect = selected === currentShuffledAnswer;
   if (isCorrect) score++;
-  userAnswers.push({ q, selected, isCorrect });
+  userAnswers.push({ q, selected, correctAnswer: currentShuffledAnswer, isCorrect });
+  recordQuizAnswer(q.id, isCorrect);
 
   // 全ボタン無効化 & ハイライト
   const allBtns = document.querySelectorAll('.choice-btn');
   allBtns.forEach(btn => {
     btn.disabled = true;
     const label = btn.querySelector('.choice-label').textContent;
-    if (label === q.answer) btn.classList.add('correct');
+    if (label === currentShuffledAnswer) btn.classList.add('correct');
     else if (label === selected && !isCorrect) btn.classList.add('wrong');
   });
 
@@ -2080,7 +2119,7 @@ function selectAnswer(selected, clickedBtn) {
     fb.innerHTML = '✅ 正解！';
   } else {
     fb.className = 'feedback-banner wrong-fb show';
-    fb.innerHTML = `❌ 不正解　正解は <strong>${q.answer}</strong>`;
+    fb.innerHTML = `❌ 不正解　正解は <strong>${currentShuffledAnswer}</strong>`;
   }
 
   // 解説
@@ -2136,7 +2175,7 @@ function showResult() {
       <div class="ans-q">Q${i+1}. ${ua.q.question}</div>
       <div class="ans-result">
         <span class="ans-badge ${ua.isCorrect ? 'ok' : 'ng'}">${ua.isCorrect ? '正解' : '不正解'}</span>
-        <span style="color:#64748b">あなた: <strong>${ua.selected}</strong>　正解: <strong>${ua.q.answer}</strong></span>
+        <span style="color:#64748b">あなた: <strong>${ua.selected}</strong>　正解: <strong>${ua.correctAnswer}</strong></span>
       </div>
       ${!ua.isCorrect ? `<div style="margin-top:6px;font-size:12px;color:#78350f;background:#fffbeb;border-radius:6px;padding:6px 8px;">${ua.q.explanation}</div>` : ''}
     `;
@@ -2153,6 +2192,27 @@ function showScreen(id) {
 
 function goHome() {
   showScreen('screenStart');
+}
+
+// ===== 苦手問題優先モード =====
+function startWeakMode() {
+  const stats = getQuizStats();
+  const attempted = quizData.filter(q => stats[q.id] && stats[q.id].a > 0);
+  if (attempted.length === 0) {
+    alert('まだ解答履歴がありません。先に問題を解いてください。');
+    return;
+  }
+  attempted.sort((a, b) => {
+    const ra = stats[a.id].c / stats[a.id].a;
+    const rb = stats[b.id].c / stats[b.id].a;
+    return ra - rb;
+  });
+  currentList = attempted;
+  currentIndex = 0;
+  score = 0;
+  userAnswers = [];
+  showScreen('screenQuiz');
+  renderQuestion();
 }
 
 // ===== 初期化 =====
