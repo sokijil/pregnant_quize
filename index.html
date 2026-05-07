@@ -123,6 +123,24 @@
   .sub-btn.random { background: #eff6ff; border-color: #93c5fd; color: var(--primary); }
   .sub-btn.ordered { background: #f0fdf4; border-color: #86efac; color: var(--success); }
 
+  /* 問題数セレクター */
+  .count-selector { display: flex; gap: 8px; margin-bottom: 16px; }
+  .count-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    color: #64748b;
+    transition: background 0.1s, border-color 0.1s, color 0.1s;
+  }
+  .count-btn:active { opacity: 0.8; }
+  .count-btn.selected { background: #eff6ff; border-color: #93c5fd; color: var(--primary); }
+
   /* セクションブロック */
   .section-block { margin-bottom: 10px; }
   .mode-btn.pharma-btn { border-color: #bfdbfe; }
@@ -379,7 +397,7 @@
       <p>妊婦・授乳婦 認定試験対策</p>
     </div>
     <div class="header-right">
-      <span class="update-date">更新: <span id="liveClock">2026.05.05</span></span>
+      <span class="update-date">更新: 2026.05.08</span>
     </div>
   </div>
   <div class="start-wrap">
@@ -387,6 +405,15 @@
       <div class="icon">🧬</div>
       <h2>薬剤師のための薬理問題集</h2>
       <p>全245問・5択・解説付き<br>14テーマで学べる認定試験対策問題集</p>
+    </div>
+
+    <div class="section-title">出題数を選択</div>
+    <div class="count-selector">
+      <button class="count-btn" onclick="setCount(5)">5問</button>
+      <button class="count-btn" onclick="setCount(10)">10問</button>
+      <button class="count-btn" onclick="setCount(15)">15問</button>
+      <button class="count-btn" onclick="setCount(20)">20問</button>
+      <button class="count-btn selected" onclick="setCount(0)">全問</button>
     </div>
 
     <div class="section-title">セクションを選択</div>
@@ -2163,6 +2190,7 @@ let score = 0;
 let userAnswers = [];
 let answered = false;
 let currentShuffledAnswer = '';
+let selectedCount = 0;
 
 // ===== カテゴリリスト構築 =====
 function buildCatList() {
@@ -2237,9 +2265,18 @@ function toggleSub(subId, btn) {
 }
 
 // ===== 難易度別クイズ開始 =====
+function setCount(n) {
+  selectedCount = n;
+  document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('selected'));
+  const btns = document.querySelectorAll('.count-btn');
+  const labels = [5, 10, 15, 20, 0];
+  btns.forEach((btn, i) => { if (labels[i] === n) btn.classList.add('selected'); });
+}
+
 function startQuizByDifficulty(diff, shuffle) {
   currentList = quizData.filter(q => q.difficulty === diff);
   if (shuffle) currentList.sort(() => Math.random() - 0.5);
+  if (selectedCount > 0) currentList = currentList.slice(0, selectedCount);
   currentIndex = 0; score = 0; userAnswers = [];
   showScreen('screenQuiz');
   renderQuestion();
@@ -2261,6 +2298,7 @@ function startQuiz(mode, shuffle) {
   if (shuffle) {
     currentList.sort(() => Math.random() - 0.5);
   }
+  if (selectedCount > 0) currentList = currentList.slice(0, selectedCount);
   currentIndex = 0;
   score = 0;
   userAnswers = [];
@@ -2415,18 +2453,6 @@ function goHome() {
 // ===== 初期化 =====
 buildCatList();
 
-// ===== ライブ時刻表示 =====
-(function() {
-  function tick() {
-    const d = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    const s = d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-    const el = document.getElementById('liveClock');
-    if (el) el.textContent = s;
-  }
-  tick();
-  setInterval(tick, 60000);
-})();
 </script>
 </body>
 </html>
